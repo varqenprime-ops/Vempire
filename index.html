@@ -153,6 +153,18 @@
             }
         }
 
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 900;
+            transition: opacity 0.3s;
+        }
+
         .sidebar-brand {
             font-size: 1.5rem;
             font-weight: 800;
@@ -1118,6 +1130,7 @@
     </div>
 
     <div id="app-screen" class="hidden">
+        <div id="sidebar-backdrop" class="sidebar-backdrop hidden" onclick="toggleSidebar()"></div>
         <!-- Dashboard Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-brand">
@@ -1144,27 +1157,20 @@
         <!-- Main Workspace -->
         <div class="main-content-wrapper">
             <div class="app-container">
-                <header class="topbar">
-                    <div class="mobile-menu-toggle" onclick="toggleSidebar()">☰</div>
-                    <div class="header-title" id="hdr-driver-name">Motorista <span>PRO</span></div>
+                <header class="topbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="mobile-menu-toggle" onclick="toggleSidebar()" style="margin: 0; padding: 0; font-size: 1.8rem;">☰</div>
+                        <div class="header-title" id="main-view-title" style="margin: 0; font-size: 1.8rem;">Perfil</div>
+                    </div>
+                    <div onclick="openSettingsModal()" style="width: 42px; height: 42px; background: var(--accent-pink); border-radius: 12px; display:flex; align-items:center; justify-content:center; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">⚙️</div>
                 </header>
                 <div id="top-banner-info"
-                    style="background: var(--accent); color: white; text-align: center; padding: 12px; font-weight: 800; font-size: 0.9rem; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);">
-                    Nome: ... - Matrícula: ...
+                    style="background: var(--accent); color: white; text-align: center; padding: 12px; font-weight: 800; font-size: 0.9rem; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);">
+                    <span id="hdr-driver-name-text">Motorista: ...</span> — <span id="hdr-truck-plate-text">Matrícula: ...</span>
                 </div>
 
                 <!-- CALENDAR VIEW -->
                 <div id="view-calendar">
-                    <header class="topbar">
-                        <div class="header-title">Calendário <span id="ver-span">PRO V4.1</span></div>
-                        <div style="display:flex; gap: 10px; align-items:center;">
-                            <div style="text-align: right;">
-                                <div id="hdr-driver-name" style="font-size: 1rem; font-weight: 800;">...</div>
-                                <div id="hdr-truck-plate" style="font-size: 0.8rem; color: var(--text-muted);">...</div>
-                            </div>
-                            <div style="width: 45px; height: 45px; background: var(--accent); border-radius: 12px; display:flex; align-items:center; justify-content:center; font-size: 1.2rem;">👤</div>
-                        </div>
-                    </header>
 
                     <div class="calendar-card">
                         <div class="cal-header">
@@ -1202,10 +1208,6 @@
 
                 <!-- PROFILE VIEW -->
                 <div id="view-profile" class="hidden">
-                    <header class="topbar">
-                <div class="header-title">Perfil <span id="ver-span-p">DEF V4.1</span></div>
-                        <div onclick="openSettingsModal()" style="width: 45px; height: 45px; background: var(--accent-pink); border-radius: 12px; display:flex; align-items:center; justify-content:center; font-size: 1.2rem; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">⚙️</div>
-                    </header>
 
                     <div class="section-title">Dados de Frota e Pessoa</div>
                     <div class="card">
@@ -2091,9 +2093,30 @@
                     console.log('Highlight set on:', targetId);
                 }
             }
+
+            // Close sidebar on mobile after clicking an item
+            if (window.innerWidth <= 768) {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) sidebar.classList.remove('show');
+                const backdrop = document.getElementById('sidebar-backdrop');
+                if (backdrop) backdrop.classList.add('hidden');
+            }
+
             window.scrollTo(0, 0);
             if (v === 'report') renderReportUI();
             if (v === 'calendar') buildCalendar();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar) {
+                const isShowing = sidebar.classList.toggle('show');
+                if (backdrop) {
+                    if (isShowing) backdrop.classList.remove('hidden');
+                    else backdrop.classList.add('hidden');
+                }
+            }
         }
 
         // Keep navTo for compatibility if referenced elsewhere, but point to switchView
