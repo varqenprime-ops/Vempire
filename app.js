@@ -1113,9 +1113,9 @@
                     tr.innerHTML = `
                         <td><input type="text" class="mgmt-input" value="${m.label}" onchange="updateRow('markers', ${idx}, 'label', this.value)"></td>
                         <td>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <div id="preview-color-${idx}" style="width:24px; height:24px; border-radius:50%; background:${m.color}; flex-shrink:0; border:1px solid rgba(255,255,255,0.2);"></div>
-                                <input type="range" class="spectrum-slider" min="0" max="360" value="${currentHue}" 
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div id="preview-color-${idx}" class="color-swatch" style="background:${m.color};"></div>
+                                <input type="range" class="spectrum-bar" min="0" max="360" value="${currentHue}" 
                                     oninput="const hex=hueToHex(this.value); document.getElementById('preview-color-${idx}').style.background=hex; updateRow('markers', ${idx}, 'color', hex)">
                             </div>
                         </td>
