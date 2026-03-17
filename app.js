@@ -200,6 +200,19 @@
 
             ];
 
+
+            // Migration Fix v17 (Data Cleanup)
+            try {
+                const isMangled = (s) => s && (s.includes('\u0192') || s.includes('\u00F8') || s.includes('\u00AD'));
+                if (DB.config.emojiIcons) {
+                    let changed = false;
+                    DB.config.emojiIcons = DB.config.emojiIcons.map(i => {
+                        if (isMangled(i)) { changed = true; return '\ud83d\ude80'; }
+                        return i;
+                    });
+                    if (changed) DB_SAVE();
+                }
+            } catch(e) { console.error("Migration failed", e); }
         }
 
         let pdfPieInstance = null;
