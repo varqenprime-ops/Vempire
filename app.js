@@ -2049,8 +2049,9 @@
 
         }
 
-        function computeYearEngine() {
+                function computeYearEngine() {
             const year = curDate.getFullYear();
+            const currentMonth = curDate.getMonth(); // 0-11
             let res = {
                 totalKM: 0, bruto: 0, salLiquido: 0, duoLiquido: 0,
                 totalAjudasManuais: 0, totalKmGains: 0, totalExtras: 0,
@@ -2059,25 +2060,23 @@
                 monthlyKM: Array(12).fill(0)
             };
 
-            for (let m = 0; m < 12; m++) {
-                const monthKey = `${year}-${String(m + 1).padStart(2, '0')}`;
-                if (DB.events[monthKey]) {
-                    let tempDate = new Date(year, m, 1);
-                    let mRes = computeMonthEngine(tempDate);
-                    res.totalKM += mRes.totalKM;
-                    res.bruto += mRes.bruto;
-                    res.salLiquido += mRes.salLiquido;
-                    res.duoLiquido += mRes.duoLiquido;
-                    res.totalAjudasManuais += mRes.totalAjudasManuais;
-                    res.totalKmGains += mRes.totalKmGains;
-                    res.totalExtras += mRes.totalExtras;
-                    res.finalLiquidoReceber += mRes.finalLiquidoReceber;
-                    res.impostosRetidos += mRes.impostosRetidos;
-                    res.monthlyGains[m] = mRes.finalLiquidoReceber;
-                    res.monthlyKM[m] = mRes.totalKM;
-                }
+            // Somar todos os meses desde o início do ano até ao mês atual
+            for (let m = 0; m <= currentMonth; m++) {
+                let tempDate = new Date(year, m, 1);
+                let mRes = computeMonthEngine(tempDate);
+                res.totalKM += mRes.totalKM;
+                res.bruto += mRes.bruto;
+                res.salLiquido += mRes.salLiquido;
+                res.duoLiquido += mRes.duoLiquido;
+                res.totalAjudasManuais += mRes.totalAjudasManuais;
+                res.totalKmGains += mRes.totalKmGains;
+                res.totalExtras += mRes.totalExtras;
+                res.finalLiquidoReceber += mRes.finalLiquidoReceber;
+                res.impostosRetidos += mRes.impostosRetidos;
+                res.monthlyGains[m] = mRes.finalLiquidoReceber;
+                res.monthlyKM[m] = mRes.totalKM;
             }
-            res.fixoLiquido = res.salLiquido + res.duoLiquido; // Total fixo anual
+            res.fixoLiquido = res.salLiquido + res.duoLiquido;
             res.totalAjudasGeral = res.totalAjudasManuais + res.totalKmGains;
             return res;
         }
