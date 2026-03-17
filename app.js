@@ -201,9 +201,9 @@
             ];
 
 
-            // Migration Fix v17 (Data Cleanup)
+            // Migration Fix v18
             try {
-                const isMangled = (s) => s && (s.includes('\u0192') || s.includes('\u00F8') || s.includes('\u00AD'));
+                const isMangled = (s) => s && (s.includes('\u0192') || s.includes('\u00F8') || s.includes('\u00AD') || s.includes('­'));
                 if (DB.config.emojiIcons) {
                     let changed = false;
                     DB.config.emojiIcons = DB.config.emojiIcons.map(i => {
@@ -983,7 +983,7 @@
 
         let selectedSlot = -1;
 
-        const PALETTE = ['\ud83d\ude9a', '\ud83d\ude9b', '\ud83c\udfe0', '\ud83d\udce6', '\ud83d\udd27', '\ud83d\ude80', '\u2615', '\u2622\ufe0f', '\ud83d\udd27', '\ud83d\udce6', '\ud83d\udcbc', '\ud83d\ude9a', '\ud83d\ude9b', '\ud83d\ude9a', '\ud83c\udfe0', '\ud83d\udce6', '\ud83c\udfd6\ufe0f', '\ud83d\ude80', '\u2615', '\ud83d\udecf\ufe0f', '\ud83d\udd27', '\ud83d\udcb0', '\u274c', '\ud83c\udfec'];
+        const PALETTE = ['\ud83c\udfe0', '\ud83d\udce6', '\ud83d\udd27', '\u2622\ufe0f', '\ud83d\udcbc', '\ud83d\ude9a', '\ud83d\ude9b', '\ud83c\udfd6\ufe0f', '\ud83d\ude80', '\u2615', '\ud83d\udecf\ufe0f', '\ud83d\udcb0', '\u274c', '\ud83c\udfec'];
 
         function renderEmojiConfig() {
 
