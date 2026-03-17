@@ -582,6 +582,26 @@ canvas {
 }
 .btn-del-row:hover { color: var(--red); opacity: 1; }
 
+.btn-add-row {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px dashed rgba(99, 102, 241, 0.4);
+    color: var(--accent);
+    padding: 12px;
+    border-radius: 12px;
+    width: 100%;
+    margin-top: 15px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-row:hover {
+    background: var(--accent);
+    color: white;
+    border-style: solid;
+}
+
 /* Existing Color Input fix (keep for compatibility if needed) */
 input[type="color"] {
     -webkit-appearance: none; appearance: none;
