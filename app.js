@@ -1112,9 +1112,11 @@
                     const currentHue = hexToHue(m.color || '#6366f1');
                     tr.innerHTML = `
                         <td><input type="text" class="mgmt-input" value="${m.label}" onchange="updateRow('markers', ${idx}, 'label', this.value)"></td>
-                        <td>
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div id="preview-color-${idx}" class="color-swatch" style="background:${m.color};"></div>
+                        <td style="position:relative;">
+                            <div id="preview-color-${idx}" class="color-swatch" style="background:${m.color}; margin: 0 auto;" 
+                                onclick="const pop=this.nextElementSibling; document.querySelectorAll('.spectrum-popover').forEach(p=>p!==pop&&p.classList.remove('show')); pop.classList.toggle('show')"></div>
+                            <div class="spectrum-popover">
+                                <p style="font-size:0.7rem; color:var(--text-muted); margin-bottom:10px; text-align:center;">ESPECTRO</p>
                                 <input type="range" class="spectrum-bar" min="0" max="360" value="${currentHue}" 
                                     oninput="const hex=hueToHex(this.value); document.getElementById('preview-color-${idx}').style.background=hex; updateRow('markers', ${idx}, 'color', hex)">
                             </div>

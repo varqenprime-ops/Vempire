@@ -627,12 +627,29 @@ canvas {
 .spectrum-bar::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     background: white;
-    border: 2px solid var(--bg);
+    border: 2px solid #000;
     border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+.spectrum-popover {
+    display: none;
+    position: absolute;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 16px;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    margin-top: 8px;
+    width: 180px;
+}
+
+.spectrum-popover.show {
+    display: block;
 }
 
 /* Emojis */
