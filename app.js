@@ -237,7 +237,9 @@
 
         // ════════════════════════════════════════════════════
 
-        function calcSalary() {
+        function calcSalary(forcedDate) {
+
+            const workingDate = forcedDate || curDate;
 
             // ── Vari\u00E1veis de Entrada ──
 
@@ -311,7 +313,7 @@
 
             } else {
 
-                const currentMonth = curDate.getMonth();
+                const currentMonth = workingDate.getMonth();
 
                 const subNatalM = DB.config.subNatalMonth ?? 11;
 
@@ -389,17 +391,17 @@
 
         // ── Compatibilidade com chamadas existentes ──
 
-        function getTotalBruto() { return calcSalary().bruto; }
+        function getTotalBruto(d) { return calcSalary(d).bruto; }
 
-        function getDuodecimos() { const s = calcSalary(); return { natal: s.duoNatal, ferias: s.duoFerias, total: s.duoTotal }; }
+        function getDuodecimos(d) { const s = calcSalary(d); return { natal: s.duoNatal, ferias: s.duoFerias, total: s.duoTotal }; }
 
-        function getIRSRate() { return calcSalary().irsRate; }
+        function getIRSRate(d) { return calcSalary(d).irsRate; }
 
-        function getIRS() { const s = calcSalary(); return s.irsTotal; }
+        function getIRS(d) { const s = calcSalary(d); return s.irsTotal; }
 
-        function getSS() { return calcSalary().ssTotal; }
+        function getSS(d) { return calcSalary(d).ssTotal; }
 
-        function getFixoLiquido() { const s = calcSalary(); return { salLiquido: s.liquido, duoLiquido: s.liquidoDuo, total: s.liquidoTotal }; }
+        function getFixoLiquido(d) { const s = calcSalary(d); return { salLiquido: s.liquido, duoLiquido: s.liquidoDuo, total: s.liquidoTotal }; }
 
         // ── LAW RESETS
 
@@ -1931,11 +1933,11 @@
 
             // GAVETA 1: Sal\u00E1rio Mensal
 
-            let brutoBase = getTotalBruto();
+            let brutoBase = getTotalBruto(workingDate);
 
             let bruto = brutoBase + nightBonusReal; // Adiciona b\u00F3nus noturno real se for o caso
 
-            let rate = getIRSRate();
+            let rate = getIRSRate(workingDate);
 
             let ss1 = bruto * 0.11;
 
@@ -1945,7 +1947,7 @@
 
             // GAVETA 2: Duod\u00E9cimos
 
-            let duo = getDuodecimos();
+            let duo = getDuodecimos(workingDate);
 
             let ss2 = duo.total * 0.11;
 
@@ -2100,6 +2102,12 @@
             document.getElementById('rpt-year-km').innerText = yearKM.toLocaleString('pt-PT') + ' km';
 
             document.getElementById('rpt-year-bruto').innerText = `\u20AC ${yearBruto.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+
+            const rFixo = document.getElementById('rpt-year-fixo');
+            if (rFixo) rFixo.innerText = `\u20AC ${yearFixo.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+
+            const rAjudas = document.getElementById('rpt-year-ajudas');
+            if (rAjudas) rAjudas.innerText = `\u20AC ${yearAjudas.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
             document.getElementById('rpt-year-extras').innerText = `\u20AC ${yearExtras.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
