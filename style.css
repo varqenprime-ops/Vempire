@@ -251,7 +251,8 @@ body {
     font-family: inherit;
     font-size: 1rem;
     outline: none;
-    -webkit-appearance: none;
+    -webkit-appearance: none; appearance: none;
+    appearance: none;
 }
 
 .btn-go {
@@ -427,7 +428,7 @@ body {
     border-radius: 14px;
     padding: 12px;
     outline: none;
-    -webkit-appearance: none;
+    -webkit-appearance: none; appearance: none;
 }
 
 /* Modals */
@@ -531,6 +532,26 @@ canvas {
 .mgmt-table { width: 100%; border-collapse: collapse; }
 .mgmt-table th { color: var(--text-muted); font-size: 0.75rem; text-align: left; padding: 10px 5px; text-transform: uppercase; }
 .mgmt-table td { padding: 12px 5px; border-bottom: 1px solid var(--border); }
+
+/* Fix for color input rainbow correctly styling on iOS */
+input[type="color"] {
+    -webkit-appearance: none; appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 32px;
+    height: 32px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+    border: 1px solid var(--border);
+    border-radius: 50%;
+}
 
 /* Emojis */
 .emoji-grid {

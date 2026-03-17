@@ -41,17 +41,11 @@
         };
 
         const MARKERS = [
-
-            { id: 'trabalho', label: '🚚 Trabalho / Estrada', color: '#22c55e', value: 0 },
-
-            { id: 'fds_fora', label: '🏠 FDS Fora', color: '#3b82f6', value: 0 },
-
-            { id: 'adr', label: '☢️ ADR (Dia)', color: '#f97316', value: L_ADR_DIARIO },
-
-            { id: 'op', label: '📦 Opera\u00E7\u00F5es (Dia)', color: '#a855f7', value: L_OP_DIARIO },
-
-            { id: 'ferias', label: '🏖️ F\u00E9rias / Folga', color: '#eab308', value: 0 }
-
+            { id: 'trabalho', label: 'Trabalho / Estrada', color: '#22c55e', value: 0 },
+            { id: 'fds_fora', label: 'FDS Fora', color: '#3b82f6', value: 0 },
+            { id: 'adr', label: 'ADR (Dia)', color: '#f97316', value: L_ADR_DIARIO },
+            { id: 'op', label: 'Opera\u00E7\u00F5es (Dia)', color: '#a855f7', value: L_OP_DIARIO },
+            { id: 'ferias', label: 'F\u00E9rias / Folga', color: '#eab308', value: 0 }
         ];
 
         const COMPLEMENTOS = {
@@ -137,57 +131,53 @@
         let DB = JSON.parse(JSON.stringify(defaultDB));
 
         function loadUserDB(id) {
+            if (!id) return;
+            const userStoreKey = getStoreKey(id);
+            let saved = localStorage.getItem(userStoreKey);
 
-            STORE_KEY = getStoreKey(id);
-
-            let saved = localStorage.getItem(STORE_KEY);
-
-            // Migra\u00E7\u00E3o: verificar chave antiga
-
+            // Migração: se não existir chave com email, tenta a chave antiga global
             if (!saved) {
-
                 const old = localStorage.getItem(STORE_KEY_PREFIX);
-
-                if (old) { localStorage.setItem(STORE_KEY, old); saved = old; }
-
+                if (old) {
+                    localStorage.setItem(userStoreKey, old);
+                    saved = old;
+                }
             }
 
-            DB = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultDB));
+            if (saved) {
+                try {
+                    DB = JSON.parse(saved);
+                } catch (e) {
+                    DB = JSON.parse(JSON.stringify(defaultDB));
+                }
+            } else {
+                DB = JSON.parse(JSON.stringify(defaultDB));
+            }
 
             if (!DB.events) DB.events = {};
-
             if (!DB.config) DB.config = { ...defaultDB.config };
+            if (!DB.config.markers) {
+                DB.config.markers = JSON.parse(JSON.stringify(MARKERS));
+            }
 
-            if (!DB.config.markers) DB.config.markers = [...MARKERS];
+            // Migration: Strip emojis from existing marker labels as per user request
+            if (DB.config.markers) {
+                DB.config.markers.forEach(m => {
+                    if (m.label) {
+                        m.label = m.label.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF]|[\u2011-\u27BF]/g, '').trim();
+                    }
+                });
+            }
 
-            DB.config.markers.forEach(m => {
-
-                if (m.valId) {
-
-                    if (m.value === undefined) m.value = DB.config[m.valId] || 43;
-
-                    delete m.valId;
-
-                }
-
-            });
-
+            // Defaults and missing fields
             if (!DB.config.emojis) DB.config.emojis = EMOJIS.map(e => ({ icon: e, value: 0 }));
-
             if (DB.config.tabela === undefined) DB.config.tabela = 'nacional';
-
             if (DB.config.adrEnabled === undefined) DB.config.adrEnabled = false;
-
             if (DB.config.adrDias === undefined) DB.config.adrDias = 22;
-
             if (DB.config.diuEnabled === undefined) DB.config.diuEnabled = false;
-
             if (DB.config.diuValor === undefined) DB.config.diuValor = 24.63;
-
             if (DB.config.cisternaEnabled === undefined) DB.config.cisternaEnabled = false;
-
             if (DB.config.complementoFixo === undefined) DB.config.complementoFixo = 0;
-
             if (DB.config.base === undefined) DB.config.base = TABELAS.nacional.base;
 
             if (DB.config.kmEnabled === undefined) DB.config.kmEnabled = true;
@@ -1099,7 +1089,7 @@
 
                         <td><input type="text" class="mgmt-input" value="${m.label}" onchange="updateRow('markers', ${idx}, 'label', this.value)"></td>
 
-                        <td><input type="color" class="mgmt-input" value="${m.color}" style="height:30px; padding:2px;" onchange="updateRow('markers', ${idx}, 'color', this.value)"></td>
+                        <td><input type="color" class="mgmt-color-input" value="${m.color}" onchange="updateRow('markers', ${idx}, 'color', this.value)"></td>
 
                         <td><input type="number" class="mgmt-input" value="${m.value || 0}" onchange="updateRow('markers', ${idx}, 'value', +this.value)"></td>
 
