@@ -583,14 +583,16 @@ canvas {
 .btn-del-row:hover { color: var(--red); opacity: 1; }
 
 .btn-save, .btn-add-row {
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px dashed rgba(99, 102, 241, 0.4);
-    color: var(--accent);
-    padding: 14px;
-    border-radius: 16px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(99, 102, 241, 0.1) !important;
+    border: 1.5px dashed rgba(99, 102, 241, 0.4) !important;
+    color: var(--accent) !important;
+    padding: 16px;
+    border-radius: 18px;
     width: 100%;
-    margin-top: 15px;
-    font-size: 0.95rem;
+    margin-top: 20px;
+    font-size: 1rem;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.2s;
@@ -602,9 +604,10 @@ canvas {
 }
 
 .btn-save:hover, .btn-add-row:hover {
-    background: var(--accent);
-    color: white;
-    border-style: solid;
+    background: var(--accent) !important;
+    color: white !important;
+    border-style: solid !important;
+    transform: translateY(-2px);
 }
 
 .color-swatch {
