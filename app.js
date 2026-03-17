@@ -2051,7 +2051,7 @@
 
                 function computeYearEngine() {
             const year = curDate.getFullYear();
-            const currentMonth = curDate.getMonth(); // 0-11
+            const currentMonth = curDate.getMonth();
             let res = {
                 totalKM: 0, bruto: 0, salLiquido: 0, duoLiquido: 0,
                 totalAjudasManuais: 0, totalKmGains: 0, totalExtras: 0,
@@ -2060,19 +2060,18 @@
                 monthlyKM: Array(12).fill(0)
             };
 
-            // Somar todos os meses desde o início do ano até ao mês atual
             for (let m = 0; m <= currentMonth; m++) {
                 let tempDate = new Date(year, m, 1);
                 let mRes = computeMonthEngine(tempDate);
-                res.totalKM += mRes.totalKM;
-                res.bruto += mRes.bruto;
-                res.salLiquido += mRes.salLiquido;
-                res.duoLiquido += mRes.duoLiquido;
-                res.totalAjudasManuais += mRes.totalAjudasManuais;
-                res.totalKmGains += mRes.totalKmGains;
-                res.totalExtras += mRes.totalExtras;
-                res.finalLiquidoReceber += mRes.finalLiquidoReceber;
-                res.impostosRetidos += mRes.impostosRetidos;
+                res.totalKM += (mRes.totalKM || 0);
+                res.bruto += (mRes.bruto || 0);
+                res.salLiquido += (mRes.salLiquido || 0);
+                res.duoLiquido += (mRes.duoLiquido || 0);
+                res.totalAjudasManuais += (mRes.totalAjudasManuais || 0);
+                res.totalKmGains += (mRes.totalKmGains || 0);
+                res.totalExtras += (mRes.totalExtras || 0);
+                res.finalLiquidoReceber += (mRes.finalLiquidoReceber || 0);
+                res.impostosRetidos += (mRes.impostosRetidos || 0);
                 res.monthlyGains[m] = mRes.finalLiquidoReceber;
                 res.monthlyKM[m] = mRes.totalKM;
             }
@@ -2539,18 +2538,20 @@
         });
 
         function getShareText(res, type) {
+            const y = curDate.getFullYear();
+            const mFull = new Intl.DateTimeFormat('pt-PT', { month: 'long' }).format(curDate);
             const title = type === 'year' 
-                ? `*Relat\u00f3rio Journey Tracker ANUAL - ${curDate.getFullYear()}*`
-                : `*Relat\u00f3rio Journey Tracker - ${new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(curDate)}*`;
+                ? `*Relat\u00f3rio ANUAL Journey Tracker - ${y}*`
+                : `*Relat\u00f3rio Journey Tracker - ${mFull} ${y}*`;
 
             return `${title}\n` +
                 `Matr\u00edcula: ${DB.config.matricula || '-'}\n` +
                 `Motorista: ${DB.config.nome || '-'}\n\n` +
-                `\ud83d\udcca *Bruto:* \u20ac ${res.bruto.toFixed(2)}\n` +
-                `\ud83d\udd39 *L\u00edquido:* \u20ac ${res.fixoLiquido.toFixed(2)}\n` +
-                `\ud83d\udd39 *Ajudas:* \u20ac ${(res.totalAjudasManuais + (res.totalKmGains || 0)).toFixed(2)}\n` +
-                `\ud83d\udd39 *Outros:* \u20ac ${res.totalExtras.toFixed(2)}\n\n` +
-                `\u2705 *TOTAL A RECEBER:* \u20ac ${res.finalLiquidoReceber.toFixed(2)}\n\n` +
+                `*Bruto:* \u20ac ${res.bruto.toFixed(2)}\n` +
+                `*L\u00edquido:* \u20ac ${res.fixoLiquido.toFixed(2)}\n` +
+                `*Ajudas:* \u20ac ${(res.totalAjudasManuais + (res.totalKmGains || 0)).toFixed(2)}\n` +
+                `*Outros:* \u20ac ${res.totalExtras.toFixed(2)}\n\n` +
+                `*TOTAL A RECEBER:* \u20ac ${res.finalLiquidoReceber.toFixed(2)}\n\n` +
                 `_Gerado por Journey Tracker 2026_`;
         }
 
