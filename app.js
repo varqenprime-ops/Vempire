@@ -20,7 +20,7 @@
 
         const L_BASE = 1014.02;
 
-        const L_C61_PERC = 0.50; // Ajustado para 50% (Cláusula 74.ª)
+        const L_C61_PERC = 0.50; // Ajustado para 50% (Cl\u00E1usula 74.\u00AA)
 
         const L_NOTURNO_FIXO = 101.40;
 
@@ -34,7 +34,7 @@
 
 
 
-        // Cláusula 75.ª - Tir de Acordo com o Serviço
+        // Cl\u00E1usula 75.\u00AA - Tir de Acordo com o Servi\u00E7o
 
         const C75_VALORES = {
 
@@ -56,9 +56,9 @@
 
             { id: 'adr', label: '☢️ ADR (Dia)', color: '#f97316', value: L_ADR_DIARIO },
 
-            { id: 'op', label: '📦 Operações (Dia)', color: '#a855f7', value: L_OP_DIARIO },
+            { id: 'op', label: '📦 Opera\u00E7\u00F5es (Dia)', color: '#a855f7', value: L_OP_DIARIO },
 
-            { id: 'ferias', label: '🏖️ Férias / Folga', color: '#eab308', value: 0 }
+            { id: 'ferias', label: '🏖️ F\u00E9rias / Folga', color: '#eab308', value: 0 }
 
         ];
 
@@ -126,7 +126,7 @@
 
                 diuturnidades: 0,
 
-                diuValor: 24.63,        // Valor unitário por diuturnidade
+                diuValor: 24.63,        // Valor unit\u00E1rio por diuturnidade
 
                 complementoFixo: 0,     // Complemento fixo (Cisterna)
 
@@ -152,7 +152,7 @@
 
 
 
-        // Persistência de Dados
+        // Persist\u00EAncia de Dados
 
         let DB = JSON.parse(JSON.stringify(defaultDB));
 
@@ -164,7 +164,7 @@
 
             let saved = localStorage.getItem(STORE_KEY);
 
-            // Migração: verificar chave antiga
+            // Migra\u00E7\u00E3o: verificar chave antiga
 
             if (!saved) {
 
@@ -262,7 +262,7 @@
 
         function calcSalary() {
 
-            // ── Variáveis de Entrada ──
+            // ── Vari\u00E1veis de Entrada ──
 
             const base = DB.config.base || L_BASE;
 
@@ -290,7 +290,7 @@
 
 
 
-            // ── Passo 2: Cláusulas ──
+            // ── Passo 2: Cl\u00E1usulas ──
 
             // C61 incide sobre (Base Legal + Diuturnidades)
 
@@ -298,7 +298,7 @@
 
             const compPerc = legalBaseForC61 * percC;
 
-            const c75 = C75_VALORES[DB.config.tabela] || 0; // Cláusula 75 Ibérica/Internacional
+            const c75 = C75_VALORES[DB.config.tabela] || 0; // Cl\u00E1usula 75 Ib\u00E9rica/Internacional
 
 
 
@@ -314,21 +314,21 @@
 
             const adr = adrOn ? (22 * L_ADR_DIARIO) : 0;
 
-            const operacoes = 0; // Calculado no calendário
+            const operacoes = 0; // Calculado no calend\u00E1rio
 
 
 
-            // ── Bruto Mensal (Gaveta 1 — base para escalão IRS) ──
+            // ── Bruto Mensal (Gaveta 1 — base para escal\u00E3o IRS) ──
 
             const bruto = base + diuturnidades + c61 + compPerc + c75 + noturno + cisterna + adr + operacoes;
 
 
 
-            // ── Passo 3 & 4: Duodécimos (Gaveta 2) ou Subsídios Integrais ──
+            // ── Passo 3 & 4: Duod\u00E9cimos (Gaveta 2) ou Subs\u00EDdios Integrais ──
 
-            // Natal mantém a fórmula original (Base + Diuturnidades + Complemento)
+            // Natal mant\u00E9m a f\u00F3rmula original (Base + Diuturnidades + Complemento)
 
-            // Férias inclui todas as cláusulas: Base + Diuturnidades + Complemento + Noturno (10%) + C61 (50%) + C75
+            // F\u00E9rias inclui todas as cl\u00E1usulas: Base + Diuturnidades + Complemento + Noturno (10%) + C61 (50%) + C75
 
             const natalVal = (base + diuturnidades + compPerc);
 
@@ -366,7 +366,7 @@
 
 
 
-            // ── IRS 2026: taxa sobre Bruto (Gaveta 1), aplicada às duas gavetas de forma autónoma ──
+            // ── IRS 2026: taxa sobre Bruto (Gaveta 1), aplicada às duas gavetas de forma aut\u00F3noma ──
 
             let irsRate = 0;
 
@@ -388,7 +388,7 @@
 
             const irsSalario = bruto * irsRate;
 
-            const irsDuo = duoTotal * irsRate;   // mesma taxa, gaveta autónoma
+            const irsDuo = duoTotal * irsRate;   // mesma taxa, gaveta aut\u00F3noma
 
             const irsTotal = irsSalario + irsDuo;
 
@@ -400,7 +400,7 @@
 
 
 
-            // ── Líquidos ──
+            // ── L\u00EDquidos ──
 
             const liquido = bruto - (bruto * 0.11) - irsSalario;
 
@@ -428,7 +428,7 @@
 
                 ssTotal, irsSalario, irsDuo, irsTotal, totalDesc,
 
-                // líquidos
+                // l\u00EDquidos
 
                 irsRate, liquido, liquidoDuo, liquidoTotal
 
@@ -878,7 +878,7 @@
 
 
 
-            // Valor unitário de Diuturnidade
+            // Valor unit\u00E1rio de Diuturnidade
 
             const diuValorInput = document.getElementById('cfg-diuValor');
 
@@ -1120,7 +1120,7 @@
 
         let selectedSlot = -1;
 
-        const PALETTE = ['🚚', '🚛', '🏠', '📦', '🔧', '­ƒøú', '­ƒøñ', '☢️', '🔧', '📦', '💼', '🚚', '🚛', '🚚', '🏠', '📦', '🏖️', '🚀', '☕', '🛌', '🔧', '💰', '❌', '🏢'];
+        const PALETTE = ['🚚', '🚛', '🏠', '📦', '🔧', '­ƒø\u00FA', '­ƒøñ', '☢️', '🔧', '📦', '💼', '🚚', '🚛', '🚚', '🏠', '📦', '🏖️', '🚀', '☕', '🛌', '🔧', '💰', '❌', '🏢'];
 
 
 
@@ -1254,7 +1254,7 @@
 
                         <td><input type="number" class="mgmt-input" value="${m.value || 0}" onchange="updateRow('markers', ${idx}, 'value', +this.value)"></td>
 
-                        <td><span class="btn-del-row" onclick="delRow('markers', ${idx})">×</span></td>
+                        <td><span class="btn-del-row" onclick="delRow('markers', ${idx})">\u00D7</span></td>
 
                     `;
 
@@ -1282,7 +1282,7 @@
 
                         <td><input type="number" class="mgmt-input" value="${e.valor}" step="0.01" onchange="updateKmRow(${idx}, 'valor', +this.value)"></td>
 
-                        <td><span class="btn-del-row" onclick="delKmEscalao(${idx})">×</span></td>
+                        <td><span class="btn-del-row" onclick="delKmEscalao(${idx})">\u00D7</span></td>
 
                     `;
 
@@ -1420,35 +1420,35 @@
 
             // ── Componentes do Bruto ──
 
-            set('lbl-comp-diu', '€ ' + fmt(diutVal));
+            set('lbl-comp-diu', '\u20AC ' + fmt(diutVal));
 
-            set('lbl-comp-c61', '€ ' + fmt(c61));
+            set('lbl-comp-c61', '\u20AC ' + fmt(c61));
 
-            set('lbl-comp-c75', '€ ' + fmt(calcSalary().c75));
+            set('lbl-comp-c75', '\u20AC ' + fmt(calcSalary().c75));
 
-            set('lbl-comp-perc', '€ ' + fmt(complementoPerc));
+            set('lbl-comp-perc', '\u20AC ' + fmt(complementoPerc));
 
 
 
             if (DB.config.noturnoEnabled) {
 
-                set('lbl-comp-noturno', '€ ' + fmt(noturno));
+                set('lbl-comp-noturno', '\u20AC ' + fmt(noturno));
 
             } else {
 
-                set('lbl-comp-noturno', 'Modo Real (Variável)');
+                set('lbl-comp-noturno', 'Modo Real (Vari\u00E1vel)');
 
             }
 
 
 
-            set('lbl-comp-adr', '€ ' + fmt(adrM));
+            set('lbl-comp-adr', '\u20AC ' + fmt(adrM));
 
-            set('lbl-comp-cisterna', '€ ' + fmt(cisternaM));
+            set('lbl-comp-cisterna', '\u20AC ' + fmt(cisternaM));
 
-            // Duodécimos Brutos
+            // Duod\u00E9cimos Brutos
 
-            // SUBSÍDIOS (Duodécimos ou Integrais)
+            // SUBSÍDIOS (Duod\u00E9cimos ou Integrais)
 
             const isDuoOn = !!DB.config.duoEnabled;
 
@@ -1468,19 +1468,19 @@
 
             const subTitle = document.getElementById('sub-title-label');
 
-            if (subTitle) subTitle.innerText = isDuoOn ? "🎁🏖️ Duodécimos / Mês" : "🎁🏖️ Subsídios Integrais";
+            if (subTitle) subTitle.innerText = isDuoOn ? "🎁🏖️ Duod\u00E9cimos / M\u00EAs" : "🎁🏖️ Subs\u00EDdios Integrais";
 
 
 
             const subDescTitle = document.getElementById('sub-desc-title-label');
 
-            if (subDescTitle) subDescTitle.innerText = isDuoOn ? "Descontos dos Duodécimos" : "Descontos dos Subsídios";
+            if (subDescTitle) subDescTitle.innerText = isDuoOn ? "Descontos dos Duod\u00E9cimos" : "Descontos dos Subs\u00EDdios";
 
 
 
-            set('lbl-duo-natal', '€ ' + fmt(s.duoNatal));
+            set('lbl-duo-natal', '\u20AC ' + fmt(s.duoNatal));
 
-            set('lbl-duo-ferias', '€ ' + fmt(s.duoFerias));
+            set('lbl-duo-ferias', '\u20AC ' + fmt(s.duoFerias));
 
 
 
@@ -1488,7 +1488,7 @@
 
             let totalBrutoDisplay = s.totalAbono;
 
-            set('lbl-bruto-total', '€ ' + fmt(totalBrutoDisplay));
+            set('lbl-bruto-total', '\u20AC ' + fmt(totalBrutoDisplay));
 
 
 
@@ -1510,15 +1510,15 @@
 
             // ── Descontos ──
 
-            set('lbl-ss', '- € ' + fmt(bruto * 0.11));
+            set('lbl-ss', '- \u20AC ' + fmt(bruto * 0.11));
 
             set('lbl-irs-rate', (rate * 100).toFixed(1));
 
-            set('lbl-irs', '- € ' + fmt(bruto * rate));
+            set('lbl-irs', '- \u20AC ' + fmt(bruto * rate));
 
 
 
-            // Descontos Subsídios
+            // Descontos Subs\u00EDdios
 
             const duoDescBlock = document.getElementById('duo-desc-block');
 
@@ -1534,23 +1534,23 @@
 
             if (isDuoOn || s.duoTotal > 0) {
 
-                set('lbl-duo-ss', '- € ' + fmt(s.duoTotal * 0.11));
+                set('lbl-duo-ss', '- \u20AC ' + fmt(s.duoTotal * 0.11));
 
-                set('lbl-duo-irs', '- € ' + fmt(s.duoTotal * rate));
+                set('lbl-duo-irs', '- \u20AC ' + fmt(s.duoTotal * rate));
 
             }
 
 
 
-            // ── Líquido ──
+            // ── L\u00EDquido ──
 
-            set('lbl-fixo-liq', '€ ' + fmt(liquido.total));
+            set('lbl-fixo-liq', '\u20AC ' + fmt(liquido.total));
 
 
 
             const hdrF = document.getElementById('hdr-fixo');
 
-            if (hdrF) hdrF.innerText = '€ ' + fmt(liquido.total);
+            if (hdrF) hdrF.innerText = '\u20AC ' + fmt(liquido.total);
 
 
 
@@ -1576,7 +1576,7 @@
 
             const name = DB.config.nome || "Motorista";
 
-            const plate = DB.config.matricula || "Matrícula não definida";
+            const plate = DB.config.matricula || "Matr\u00EDcula n\u00E3o definida";
 
             
 
@@ -1584,7 +1584,7 @@
 
             if (hPlate) hPlate.innerText = plate;
 
-            if (hBanner) hBanner.innerText = `Motorista: ${name} — Matrícula: ${plate}`;
+            if (hBanner) hBanner.innerText = `Motorista: ${name} — Matr\u00EDcula: ${plate}`;
 
         }
 
@@ -1690,7 +1690,7 @@
 
 
 
-            // Limpar auxiliares para não herdar do dia anterior
+            // Limpar auxiliares para n\u00E3o herdar do dia anterior
 
             const mKMS = document.getElementById('m-km-start');
 
@@ -1838,13 +1838,13 @@
 
                         <span style="font-size: 1.4rem;">${obj.icon}</span>
 
-                        <span style="color:var(--red); font-weight:bold; cursor:pointer;" onclick="removeEmoji(${idx})">Remover ×</span>
+                        <span style="color:var(--red); font-weight:bold; cursor:pointer;" onclick="removeEmoji(${idx})">Remover \u00D7</span>
 
                     </div>
 
                     <div style="display:grid; grid-template-columns: 1fr 2fr; gap:8px;">
 
-                        <input type="number" value="${obj.value}" placeholder="Valor €" class="mgmt-input" oninput="selectedEmojiObjs[${idx}].value = +this.value">
+                        <input type="number" value="${obj.value}" placeholder="Valor \u20AC" class="mgmt-input" oninput="selectedEmojiObjs[${idx}].value = +this.value">
 
                         <input type="text" value="${obj.note || ''}" placeholder="Nota (opcional)" class="mgmt-input" oninput="selectedEmojiObjs[${idx}].note = this.value">
 
@@ -2132,7 +2132,7 @@
 
 
 
-                // 1. Somatório de Ajudas Manuais (Marcadores/Pinturas)
+                // 1. Somat\u00F3rio de Ajudas Manuais (Marcadores/Pinturas)
 
                 let dailyAjudas = 0;
 
@@ -2154,7 +2154,7 @@
 
 
 
-                // 2. Somatório de Extras (Emojis/Ganhos Individuais)
+                // 2. Somat\u00F3rio de Extras (Emojis/Ganhos Individuais)
 
                 if (evt.emojis && evt.emojis.length > 0) {
 
@@ -2178,7 +2178,7 @@
 
 
 
-                // 4. Bónus Noturno Real (Cláusula 51.ª - 25%)
+                // 4. B\u00F3nus Noturno Real (Cl\u00E1usula 51.\u00AA - 25%)
 
                 if (!DB.config.noturnoEnabled && evt.shiftStart && evt.shiftEnd) {
 
@@ -2222,11 +2222,11 @@
 
 
 
-            // GAVETA 1: Salário Mensal
+            // GAVETA 1: Sal\u00E1rio Mensal
 
             let brutoBase = getTotalBruto();
 
-            let bruto = brutoBase + nightBonusReal; // Adiciona bónus noturno real se for o caso
+            let bruto = brutoBase + nightBonusReal; // Adiciona b\u00F3nus noturno real se for o caso
 
             let rate = getIRSRate();
 
@@ -2238,7 +2238,7 @@
 
 
 
-            // GAVETA 2: Duodécimos
+            // GAVETA 2: Duod\u00E9cimos
 
             let duo = getDuodecimos();
 
@@ -2250,7 +2250,7 @@
 
 
 
-            // Final: Salário + Duodécimos + Isentos (Ajudas + KM + Extras)
+            // Final: Sal\u00E1rio + Duod\u00E9cimos + Isentos (Ajudas + KM + Extras)
 
             let finalLiquidoReceber = salLiquido + duoLiquido + totalAjudasManuais + totalKmGains + totalExtras;
 
@@ -2290,7 +2290,7 @@
 
         function renderReportUI() {
 
-            const fmt = (v) => `€ ${v.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const fmt = (v) => `\u20AC ${v.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             if (currentRptView === 'month') {
 
@@ -2326,7 +2326,7 @@
 
 
 
-                // Duodécimos row (show if enabled OR if there is an integral subsidy payment this month)
+                // Duod\u00E9cimos row (show if enabled OR if there is an integral subsidy payment this month)
 
                 const rDuoRow = document.getElementById('rpt-duo-row');
 
@@ -2370,7 +2370,7 @@
 
 
 
-            // Percorrer todos os meses do ano em questão
+            // Percorrer todos os meses do ano em quest\u00E3o
 
             for (let m = 0; m < 12; m++) {
 
@@ -2378,11 +2378,11 @@
 
 
 
-                // Precisamos simular o engine para cada mês que tenha dados
+                // Precisamos simular o engine para cada m\u00EAs que tenha dados
 
                 if (DB.events[monthKey]) {
 
-                    // Para precisão total, vamos usar temp engine
+                    // Para precis\u00E3o total, vamos usar temp engine
 
                     let tempDate = new Date(year, m, 1);
 
@@ -2418,11 +2418,11 @@
 
             document.getElementById('rpt-year-km').innerText = yearKM.toLocaleString('pt-PT') + ' km';
 
-            document.getElementById('rpt-year-bruto').innerText = `€ ${yearBruto.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('rpt-year-bruto').innerText = `\u20AC ${yearBruto.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
-            document.getElementById('rpt-year-extras').innerText = `€ ${yearExtras.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('rpt-year-extras').innerText = `\u20AC ${yearExtras.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
-            document.getElementById('rpt-year-final').innerText = `€ ${yearFinal.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('rpt-year-final').innerText = `\u20AC ${yearFinal.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
 
 
@@ -2490,7 +2490,7 @@
 
                             {
 
-                                label: 'Ganhos (€)',
+                                label: 'Ganhos (\u20AC)',
 
                                 data: barData,
 
@@ -2538,21 +2538,21 @@
 
         function fillPDFContainer(res) {
 
-            document.getElementById('pdf-nome').innerText = DB.config.nome || 'Não Definido';
+            document.getElementById('pdf-nome').innerText = DB.config.nome || 'N\u00E3o Definido';
 
             document.getElementById('pdf-matricula').innerText = DB.config.matricula || 'N/A';
 
-            document.getElementById('pdf-month-lbl').innerText = `Relatório de ${new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(curDate)}`;
+            document.getElementById('pdf-month-lbl').innerText = `Relat\u00F3rio de ${new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(curDate)}`;
 
 
 
-            document.getElementById('pdf-impostos').innerText = `€ ${res.impostosRetidos.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('pdf-impostos').innerText = `\u20AC ${res.impostosRetidos.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
-            document.getElementById('pdf-ajudas').innerText = `€ ${(res.totalAjudasManuais + res.totalKmGains).toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('pdf-ajudas').innerText = `\u20AC ${(res.totalAjudasManuais + res.totalKmGains).toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
             document.getElementById('pdf-ajudas-rule').innerText = `(Pinturas + KM)`;
 
-            document.getElementById('pdf-final').innerText = `€ ${res.finalLiquidoReceber.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('pdf-final').innerText = `\u20AC ${res.finalLiquidoReceber.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
 
 
@@ -2644,7 +2644,7 @@
 
                         <td style="text-align: right;">${km > 0 ? km : '-'}</td>
 
-                        <td style="text-align: right; color: ${extra > 0 ? '#eab308' : '#858f88'}">${extra > 0 ? '€ ' + extra.toFixed(2) : '-'}</td>
+                        <td style="text-align: right; color: ${extra > 0 ? '#eab308' : '#858f88'}">${extra > 0 ? '\u20AC ' + extra.toFixed(2) : '-'}</td>
 
                     </tr>`;
 
@@ -2682,7 +2682,7 @@
 
                     data: {
 
-                        labels: ['Líquido Fixo', 'Total Ajudas', 'SS+IRS', 'Outros'],
+                        labels: ['L\u00EDquido Fixo', 'Total Ajudas', 'SS+IRS', 'Outros'],
 
                         datasets: [{
 
@@ -2706,7 +2706,7 @@
 
                             legend: { position: 'bottom', labels: { color: '#ffffff', font: { size: 11, family: 'Outfit' }, padding: 15 } },
 
-                            title: { display: true, text: 'Balanço Geral (€)', color: '#858f88', font: { size: 14, family: 'Outfit' } }
+                            title: { display: true, text: 'Balan\u00E7o Geral (\u20AC)', color: '#858f88', font: { size: 14, family: 'Outfit' } }
 
                         }
 
@@ -2736,7 +2736,7 @@
 
                         datasets: [{
 
-                            label: 'Ganhos Variáveis (€)',
+                            label: 'Ganhos Vari\u00E1veis (\u20AC)',
 
                             data: res.weekData,
 
@@ -2764,7 +2764,7 @@
 
                             legend: { display: false },
 
-                            title: { display: true, text: 'Produção por Semana', color: '#858f88', font: { size: 14, family: 'Outfit' } }
+                            title: { display: true, text: 'Produ\u00E7\u00E3o por Semana', color: '#858f88', font: { size: 14, family: 'Outfit' } }
 
                         }
 
@@ -2794,11 +2794,11 @@
 
             // Header Info
 
-            csvRows.push(`Relatório Journey Tracker - ${monthName}`);
+            csvRows.push(`Relat\u00F3rio Journey Tracker - ${monthName}`);
 
-            csvRows.push(`Motorista:;${DB.config.nome || 'Não Definido'}`);
+            csvRows.push(`Motorista:;${DB.config.nome || 'N\u00E3o Definido'}`);
 
-            csvRows.push(`Matrícula:;${DB.config.matricula || 'N/A'}`);
+            csvRows.push(`Matr\u00EDcula:;${DB.config.matricula || 'N/A'}`);
 
             csvRows.push('');
 
@@ -2806,7 +2806,7 @@
 
             // Daily Table Header
 
-            csvRows.push('Dia;Estado / Marcadores;KM;Outros (€)');
+            csvRows.push('Dia;Estado / Marcadores;KM;Outros (\u20AC)');
 
 
 
@@ -2868,19 +2868,19 @@
 
             csvRows.push('RESUMO FINANCEIRO (CCT 2026)');
 
-            csvRows.push(`Vencimento Bruto:;${res.bruto.toFixed(2).replace('.', ',')} €`);
+            csvRows.push(`Vencimento Bruto:;${res.bruto.toFixed(2).replace('.', ',')} \u20AC`);
 
-            csvRows.push(`Líquido Fixo:;${res.fixoLiquido.toFixed(2).replace('.', ',')} €`);
+            csvRows.push(`L\u00EDquido Fixo:;${res.fixoLiquido.toFixed(2).replace('.', ',')} \u20AC`);
 
-            csvRows.push(`Total Ajudas (Manuais):;${res.totalAjudasManuais.toFixed(2).replace('.', ',')} €`);
+            csvRows.push(`Total Ajudas (Manuais):;${res.totalAjudasManuais.toFixed(2).replace('.', ',')} \u20AC`);
 
-            csvRows.push(`Total Outros:;${res.totalExtras.toFixed(2).replace('.', ',')} €`);
+            csvRows.push(`Total Outros:;${res.totalExtras.toFixed(2).replace('.', ',')} \u20AC`);
 
-            csvRows.push(`Retenções (IRS + SS):;${res.impostosRetidos.toFixed(2).replace('.', ',')} €`);
+            csvRows.push(`Reten\u00E7\u00F5es (IRS + SS):;${res.impostosRetidos.toFixed(2).replace('.', ',')} \u20AC`);
 
             csvRows.push('');
 
-            csvRows.push(`TOTAL DO MÊS A RECEBER:;${res.finalLiquidoReceber.toFixed(2).replace('.', ',')} €`);
+            csvRows.push(`TOTAL DO MÊS A RECEBER:;${res.finalLiquidoReceber.toFixed(2).replace('.', ',')} \u20AC`);
 
 
 
@@ -2912,21 +2912,21 @@
 
         function getShareText(res) {
 
-            return `*Relatório Journey Tracker - ${new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(curDate)}*\n` +
+            return `*Relat\u00F3rio Journey Tracker - ${new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(curDate)}*\n` +
 
-                `Matrícula: ${DB.config.matricula || '-'}\n` +
+                `Matr\u00EDcula: ${DB.config.matricula || '-'}\n` +
 
                 `Motorista: ${DB.config.nome || '-'}\n\n` +
 
-                `´┐¢ *Bruto:* € ${res.bruto.toFixed(2)}\n` +
+                `´┐¢ *Bruto:* \u20AC ${res.bruto.toFixed(2)}\n` +
 
-                `­ƒö╣ *Líquido:* € ${res.fixoLiquido.toFixed(2)}\n` +
+                `­ƒö╣ *L\u00EDquido:* \u20AC ${res.fixoLiquido.toFixed(2)}\n` +
 
-                `­ƒö╣ *Ajudas:* € ${res.totalAjudasManuais.toFixed(2)}\n` +
+                `­ƒö╣ *Ajudas:* \u20AC ${res.totalAjudasManuais.toFixed(2)}\n` +
 
-                `­ƒö╣ *Outros:* € ${res.totalExtras.toFixed(2)}\n\n` +
+                `­ƒö╣ *Outros:* \u20AC ${res.totalExtras.toFixed(2)}\n\n` +
 
-                `✅ *TOTAL A RECEBER:* € ${res.finalLiquidoReceber.toFixed(2)}\n\n` +
+                `✅ *TOTAL A RECEBER:* \u20AC ${res.finalLiquidoReceber.toFixed(2)}\n\n` +
 
                 `_Gerado por Journey Tracker 2026_`;
 
@@ -2948,7 +2948,7 @@
 
             let text = encodeURIComponent(getShareText(computeMonthEngine()));
 
-            window.location.href = `mailto:?subject=Relatório Mesal &body=${text}`;
+            window.location.href = `mailto:?subject=Relat\u00F3rio Mesal &body=${text}`;
 
         });
 
@@ -2972,7 +2972,7 @@
 
             }
 
-            // Sem sessão: mostrar login
+            // Sem sess\u00E3o: mostrar login
 
         })();
 
