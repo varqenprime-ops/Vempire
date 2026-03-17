@@ -41,11 +41,9 @@
         };
 
         const MARKERS = [
-            { id: 'trabalho', label: 'Trabalho / Estrada', color: '#22c55e', value: 0 },
-            { id: 'fds_fora', label: 'FDS Fora', color: '#3b82f6', value: 0 },
-            { id: 'adr', label: 'ADR (Dia)', color: '#f97316', value: L_ADR_DIARIO },
-            { id: 'op', label: 'Opera\u00E7\u00F5es (Dia)', color: '#a855f7', value: L_OP_DIARIO },
-            { id: 'ferias', label: 'F\u00E9rias / Folga', color: '#eab308', value: 0 }
+            { id: 'trabalho', label: 'Diárias', color: '#22c55e', value: 39.50 },
+            { id: 'fds_fora', label: 'Fim de Semana', color: '#3b82f6', value: 50.00 },
+            { id: 'adr', label: 'ADR', color: '#f97316', value: 7.50 }
         ];
 
         const COMPLEMENTOS = {
