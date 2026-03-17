@@ -113,13 +113,10 @@
                 kmEscaloes: [
 
                     { id: 1, ate: 1500, valor: 0.10 },
-
                     { id: 2, ate: 99999, valor: 0.20 }
-
-                ]
-
+                ],
+                markers: JSON.parse(JSON.stringify(MARKERS))
             },
-
             events: {}
 
         };
