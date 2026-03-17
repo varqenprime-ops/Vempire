@@ -2049,73 +2049,63 @@
 
         }
 
+        function computeYearEngine() {
+            const year = curDate.getFullYear();
+            let res = {
+                totalKM: 0, bruto: 0, salLiquido: 0, duoLiquido: 0,
+                totalAjudasManuais: 0, totalKmGains: 0, totalExtras: 0,
+                finalLiquidoReceber: 0, impostosRetidos: 0,
+                monthlyGains: Array(12).fill(0),
+                monthlyKM: Array(12).fill(0)
+            };
+
+            for (let m = 0; m < 12; m++) {
+                const monthKey = `${year}-${String(m + 1).padStart(2, '0')}`;
+                if (DB.events[monthKey]) {
+                    let tempDate = new Date(year, m, 1);
+                    let mRes = computeMonthEngine(tempDate);
+                    res.totalKM += mRes.totalKM;
+                    res.bruto += mRes.bruto;
+                    res.salLiquido += mRes.salLiquido;
+                    res.duoLiquido += mRes.duoLiquido;
+                    res.totalAjudasManuais += mRes.totalAjudasManuais;
+                    res.totalKmGains += mRes.totalKmGains;
+                    res.totalExtras += mRes.totalExtras;
+                    res.finalLiquidoReceber += mRes.finalLiquidoReceber;
+                    res.impostosRetidos += mRes.impostosRetidos;
+                    res.monthlyGains[m] = mRes.finalLiquidoReceber;
+                    res.monthlyKM[m] = mRes.totalKM;
+                }
+            }
+            res.fixoLiquido = res.salLiquido + res.duoLiquido; // Total fixo anual
+            res.totalAjudasGeral = res.totalAjudasManuais + res.totalKmGains;
+            return res;
+        }
+
         function renderAnnualReport() {
 
             const year = curDate.getFullYear();
-
-            let yearKM = 0, yearBruto = 0, yearExtras = 0, yearFinal = 0, yearImpostos = 0, yearFixo = 0, yearAjudas = 0;
-
-            let monthlyGains = Array(12).fill(0);
-
-            let monthlyKM = Array(12).fill(0);
-
-            // Percorrer todos os meses do ano em quest\u00E3o
-
-            for (let m = 0; m < 12; m++) {
-
-                const monthKey = `${year}-${String(m + 1).padStart(2, '0')}`;
-
-                // Precisamos simular o engine para cada m\u00EAs que tenha dados
-
-                if (DB.events[monthKey]) {
-
-                    // Para precis\u00E3o total, vamos usar temp engine
-
-                    let tempDate = new Date(year, m, 1);
-
-                    let res = computeMonthEngine(tempDate);
-
-                    yearKM += res.totalKM;
-
-                    yearBruto += res.bruto;
-
-                    yearFixo += res.salLiquido + res.duoLiquido;
-
-                    yearAjudas += (res.totalAjudasManuais + res.totalKmGains);
-
-                    yearExtras += res.totalExtras;
-
-                    yearFinal += res.finalLiquidoReceber;
-
-                    yearImpostos += res.impostosRetidos;
-
-                    monthlyGains[m] = res.finalLiquidoReceber;
-
-                    monthlyKM[m] = res.totalKM;
-
-                }
-
-            }
+            const res = computeYearEngine();
 
             document.getElementById('rpt-year-lbl').innerText = year;
 
-            document.getElementById('rpt-year-km').innerText = yearKM.toLocaleString('pt-PT') + ' km';
+            document.getElementById('rpt-year-km').innerText = res.totalKM.toLocaleString('pt-PT') + ' km';
 
-            document.getElementById('rpt-year-bruto').innerText = `\u20AC ${yearBruto.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('rpt-year-bruto').innerText = `\u20AC ${res.bruto.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
             const rFixo = document.getElementById('rpt-year-fixo');
-            if (rFixo) rFixo.innerText = `\u20AC ${yearFixo.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            if (rFixo) rFixo.innerText = `\u20AC ${res.fixoLiquido.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
             const rAjudas = document.getElementById('rpt-year-ajudas');
-            if (rAjudas) rAjudas.innerText = `\u20AC ${yearAjudas.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            if (rAjudas) rAjudas.innerText = `\u20AC ${res.totalAjudasGeral.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
-            document.getElementById('rpt-year-extras').innerText = `\u20AC ${yearExtras.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('rpt-year-extras').innerText = `\u20AC ${res.totalExtras.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
-            document.getElementById('rpt-year-final').innerText = `\u20AC ${yearFinal.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('rpt-year-final').innerText = `\u20AC ${res.finalLiquidoReceber.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
 
             const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-            renderUICharts(yearFixo, yearAjudas, yearImpostos, yearExtras, monthlyGains, monthNames, monthlyKM);
+            renderUICharts(res.salLiquido + res.duoLiquido, res.totalAjudasGeral, res.impostosRetidos, res.totalExtras, res.monthlyGains, monthNames, res.monthlyKM);
 
         }
 
@@ -2549,43 +2539,34 @@
 
         });
 
-        function getShareText(res) {
+        function getShareText(res, type) {
+            const title = type === 'year' 
+                ? `*Relat\u00F3rio Journey Tracker ANUAL - ${curDate.getFullYear()}*`
+                : `*Relat\u00F3rio Journey Tracker - ${new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(curDate)}*`;
 
-            return `*Relat\u00F3rio Journey Tracker - ${new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(curDate)}*\n` +
-
+            return `${title}\n` +
                 `Matr\u00EDcula: ${DB.config.matricula || '-'}\n` +
-
                 `Motorista: ${DB.config.nome || '-'}\n\n` +
-
-                `´┐¢ *Bruto:* \u20AC ${res.bruto.toFixed(2)}\n` +
-
-                `­ƒö╣ *L\u00EDquido:* \u20AC ${res.fixoLiquido.toFixed(2)}\n` +
-
-                `­ƒö╣ *Ajudas:* \u20AC ${res.totalAjudasManuais.toFixed(2)}\n` +
-
-                `­ƒö╣ *Outros:* \u20AC ${res.totalExtras.toFixed(2)}\n\n` +
-
+                `📊 *Bruto:* \u20AC ${res.bruto.toFixed(2)}\n` +
+                `🔹 *L\u00EDquido:* \u20AC ${res.fixoLiquido.toFixed(2)}\n` +
+                `🔹 *Ajudas:* \u20AC ${(res.totalAjudasManuais + (res.totalKmGains || 0)).toFixed(2)}\n` +
+                `🔹 *Outros:* \u20AC ${res.totalExtras.toFixed(2)}\n\n` +
                 `✅ *TOTAL A RECEBER:* \u20AC ${res.finalLiquidoReceber.toFixed(2)}\n\n` +
-
                 `_Gerado por Journey Tracker 2026_`;
-
         }
 
-        document.getElementById('btn-export-wa').addEventListener('click', () => {
-
-            let text = encodeURIComponent(getShareText(computeMonthEngine()));
-
+        document.getElementById('btn-export-wa').onclick = () => {
+            const res = currentRptView === 'year' ? computeYearEngine() : computeMonthEngine();
+            const text = encodeURIComponent(getShareText(res, currentRptView));
             window.open(`https://wa.me/?text=${text}`, '_blank');
+        };
 
-        });
-
-        document.getElementById('btn-export-mail').addEventListener('click', () => {
-
-            let text = encodeURIComponent(getShareText(computeMonthEngine()));
-
-            window.location.href = `mailto:?subject=Relat\u00F3rio Mesal &body=${text}`;
-
-        });
+        document.getElementById('btn-export-mail').onclick = () => {
+            const res = currentRptView === 'year' ? computeYearEngine() : computeMonthEngine();
+            const text = encodeURIComponent(getShareText(res, currentRptView));
+            const subject = currentRptView === 'year' ? 'Relat\u00F3rio Anual' : 'Relat\u00F3rio Mensal';
+            window.location.href = `mailto:?subject=${subject}&body=${text}`;
+        };
 
         // ── AUTO-RESTAURAR SESSÃO ──
 
