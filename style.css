@@ -23,6 +23,8 @@ body {
     color: var(--text-main);
     line-height: 1.5;
     overflow-x: hidden;
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .hidden { display: none !important; }
@@ -57,8 +59,9 @@ input, select {
     border: 1px solid var(--border);
     border-radius: 12px;
     color: white;
-    font-size: 16px; /* Prevents auto-zoom on iOS */
+    font-size: 16px; 
     outline: none;
+    -webkit-appearance: none;
 }
 
 button {
@@ -76,7 +79,7 @@ button {
 button:active { transform: scale(0.98); }
 
 #app-screen {
-    padding: 20px;
+    padding: 24px 20px;
     max-width: 600px;
     margin: 0 auto;
 }
@@ -90,50 +93,65 @@ header {
 
 header h2 { font-weight: 800; }
 
-header button { width: auto; padding: 8px 16px; background: #ef4444; }
+header button { width: auto; padding: 8px 16px; background: #ef4444; border-radius: 8px; }
 
 .card {
     background: var(--surface);
-    padding: 20px;
-    border-radius: 20px;
+    padding: 24px;
+    border-radius: 24px;
     border: 1px solid var(--border);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
 .card h3 {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     color: var(--text-muted);
-    margin-bottom: 16px;
-    letter-spacing: 1px;
+    margin-bottom: 20px;
+    letter-spacing: 1.5px;
+    font-weight: 800;
+}
+
+.opcoes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 8px;
 }
 
 label {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 12px;
+    background: var(--surface-alt);
+    padding: 12px;
+    border-radius: 12px;
     cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
 input[type="checkbox"] {
     width: 20px;
     height: 20px;
     margin: 0;
+    flex-shrink: 0;
 }
 
 .card p {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
+    padding: 12px 0;
     border-bottom: 1px solid var(--border);
 }
 
 .card p:last-child { border-bottom: none; }
 
-span { font-weight: 800; }
+span { font-weight: 800; color: var(--accent); }
 
 @media (max-width: 480px) {
     #app-screen { padding: 16px; }
-    .card { padding: 16px; }
+    .card { padding: 20px; }
+    .opcoes-grid { grid-template-columns: 1fr; }
 }
