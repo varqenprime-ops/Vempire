@@ -530,10 +530,56 @@ canvas {
 
 /* Management Table */
 .mgmt-table { width: 100%; border-collapse: collapse; }
-.mgmt-table th { color: var(--text-muted); font-size: 0.75rem; text-align: left; padding: 10px 5px; text-transform: uppercase; }
-.mgmt-table td { padding: 12px 5px; border-bottom: 1px solid var(--border); }
+.mgmt-table th { color: var(--text-muted); font-size: 0.75rem; text-align: left; padding: 12px 10px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+.mgmt-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 
-/* Fix for color input rainbow correctly styling on iOS */
+.mgmt-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: white;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.mgmt-input:focus {
+    border-color: var(--accent);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.mgmt-color-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 36px;
+    height: 36px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.mgmt-color-input::-webkit-color-swatch-wrapper { padding: 0; }
+.mgmt-color-input::-webkit-color-swatch {
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.btn-del-row {
+    color: var(--text-muted);
+    font-size: 1.4rem;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: 0.2s;
+}
+.btn-del-row:hover { color: var(--red); opacity: 1; }
+
+/* Existing Color Input fix (keep for compatibility if needed) */
 input[type="color"] {
     -webkit-appearance: none; appearance: none;
     -moz-appearance: none;
