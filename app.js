@@ -41,9 +41,8 @@
         };
 
         const MARKERS = [
-            { id: 'diaria_nac', label: 'Diária Nacional', color: '#22c55e', value: 25.91 },
-            { id: 'diaria_int', label: 'Diária Inter', color: '#10b981', value: 42.30 },
-            { id: 'fds', label: 'Fim de Semana', color: '#3b82f6', value: 50.00 },
+            { id: 'diaria_int', label: 'Diárias (Int)', color: '#22c55e', value: 43.00 },
+            { id: 'fds', label: 'Fim de Semana', color: '#3b82f6', value: 43.00 },
             { id: 'adr', label: 'ADR', color: '#f97316', value: 7.50 }
         ];
 
