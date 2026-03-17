@@ -2,28 +2,29 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vempire - Minimal</title>
-    <link rel="stylesheet" href="style.css?v=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vempire - Pro</title>
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
     <div id="login-screen">
         <div class="login-content">
             <h1>Vempire</h1>
             <input type="text" id="l-email" placeholder="Nome ou Email">
-            <button id="btn-login" class="btn-go">Entrar</button>
+            <input type="password" id="l-password" placeholder="Senha">
+            <button id="btn-login">Entrar</button>
         </div>
     </div>
 
     <div id="app-screen" class="hidden">
         <header>
-            <h2 id="main-view-title">Perfil</h2>
+            <h2>Perfil</h2>
             <button onclick="doLogout()">Sair</button>
         </header>
 
         <div id="view-profile">
             <div class="card">
-                <h3>Dados de Frota</h3>
+                <h3>Frota</h3>
                 <input type="text" id="cfg-nome" placeholder="Nome">
                 <input type="text" id="cfg-matricula" placeholder="Matrícula">
                 <select id="cfg-tabela">
@@ -31,8 +32,8 @@
                     <option value="iberico">Ibérico</option>
                     <option value="internacional">Internacional</option>
                 </select>
-                <input type="number" id="cfg-base" placeholder="Salário Base">
-                <input type="number" id="cfg-diuturnidades" placeholder="Diuturnidades">
+                <input type="number" id="cfg-base" placeholder="Salário Base (€)">
+                <input type="number" id="cfg-diuturnidades" placeholder="Diuturnidades (Qt.)">
             </div>
 
             <div class="card">
@@ -44,15 +45,15 @@
             </div>
 
             <div class="card">
-                <h3>Resumo</h3>
-                <p>Bruto Total: <span id="lbl-bruto-total">€ 0,00</span></p>
-                <p>Líquido Mensal: <span id="lbl-fixo-liq">€ 0,00</span></p>
+                <h3>Resumo Estimado</h3>
+                <p>Bruto: <span id="lbl-bruto-total">0,00</span></p>
                 <p>SS: <span id="lbl-ss">0,00</span></p>
                 <p>IRS: <span id="lbl-irs">0,00</span></p>
+                <p>Líquido: <span id="lbl-fixo-liq">0,00</span></p>
             </div>
         </div>
     </div>
 
-    <script src="app.js?v=1"></script>
+    <script src="app.js?v=2"></script>
 </body>
 </html>
