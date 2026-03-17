@@ -2541,17 +2541,17 @@
 
         function getShareText(res, type) {
             const title = type === 'year' 
-                ? `*Relat\u00F3rio Journey Tracker ANUAL - ${curDate.getFullYear()}*`
-                : `*Relat\u00F3rio Journey Tracker - ${new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(curDate)}*`;
+                ? `*Relat\u00f3rio Journey Tracker ANUAL - ${curDate.getFullYear()}*`
+                : `*Relat\u00f3rio Journey Tracker - ${new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' }).format(curDate)}*`;
 
             return `${title}\n` +
-                `Matr\u00EDcula: ${DB.config.matricula || '-'}\n` +
+                `Matr\u00edcula: ${DB.config.matricula || '-'}\n` +
                 `Motorista: ${DB.config.nome || '-'}\n\n` +
-                `📊 *Bruto:* \u20AC ${res.bruto.toFixed(2)}\n` +
-                `🔹 *L\u00EDquido:* \u20AC ${res.fixoLiquido.toFixed(2)}\n` +
-                `🔹 *Ajudas:* \u20AC ${(res.totalAjudasManuais + (res.totalKmGains || 0)).toFixed(2)}\n` +
-                `🔹 *Outros:* \u20AC ${res.totalExtras.toFixed(2)}\n\n` +
-                `✅ *TOTAL A RECEBER:* \u20AC ${res.finalLiquidoReceber.toFixed(2)}\n\n` +
+                `\ud83d\udcca *Bruto:* \u20ac ${res.bruto.toFixed(2)}\n` +
+                `\ud83d\udd39 *L\u00edquido:* \u20ac ${res.fixoLiquido.toFixed(2)}\n` +
+                `\ud83d\udd39 *Ajudas:* \u20ac ${(res.totalAjudasManuais + (res.totalKmGains || 0)).toFixed(2)}\n` +
+                `\ud83d\udd39 *Outros:* \u20ac ${res.totalExtras.toFixed(2)}\n\n` +
+                `\u2705 *TOTAL A RECEBER:* \u20ac ${res.finalLiquidoReceber.toFixed(2)}\n\n` +
                 `_Gerado por Journey Tracker 2026_`;
         }
 
