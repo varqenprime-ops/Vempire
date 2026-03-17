@@ -1685,6 +1685,13 @@
 
         function closeModal() { document.getElementById('modal-select').classList.add('hidden'); }
 
+        // Fechar balões ao clicar fora
+        document.querySelectorAll('.modal-overlay').forEach(ov => {
+            ov.addEventListener('click', (e) => {
+                if (e.target === ov) ov.classList.add('hidden');
+            });
+        });
+
         
 
         function openSettingsModal() {
