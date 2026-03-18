@@ -103,7 +103,6 @@
                 diuValor: 24.63,        // Valor unit\u00E1rio por diuturnidade
 
                 complementoFixo: 0,     // Complemento fixo (Cisterna)
-                complementoTir: 135.00,  // Prémio TIR / Cláusula 75 (Pode ser manual)
                 base: 1014.02,
 
                 theme: 'dark',
@@ -258,7 +257,7 @@
 
             const compPerc = legalBaseForC61 * percC;
 
-            const c75 = DB.config.complementoTir || 0; // Prémio TIR / Cláusula 75 (Manual)
+            const c75 = C75_VALORES[DB.config.tabela] || 0; // Cláusula 75 Ibérica/Internacional (Obrigatório)
 
             // C61 incide sobre (Base Legal + Diuturnidades + Complementos)
 
@@ -710,10 +709,8 @@
 
             // Bind config inputs
 
-            ['nome', 'matricula', 'civil', 'filhos', 'base', 'tabela', 'complementoTir'].forEach(k => {
-                let elId = 'cfg-' + k;
-                if (k === 'complementoTir') elId = 'cfg-tir';
-                let el = document.getElementById(elId);
+            ['nome', 'matricula', 'civil', 'filhos', 'base', 'tabela'].forEach(k => {
+                let el = document.getElementById('cfg-' + k);
                 if (!el) return;
                 let val = DB.config[k] ?? defaultDB.config[k];
                 if (el.type === 'number') el.value = val;
