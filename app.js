@@ -2068,6 +2068,16 @@
             for (let m = 0; m <= currentMonth; m++) {
                 let tempDate = new Date(year, m, 1);
                 let mRes = computeMonthEngine(tempDate);
+                
+                // Só conta para o anual se houver algum registo (KM, Marcadores ou Extras/Emojis com valor)
+                // Ou se existir qualquer evento gravado no histórico desse mês
+                const mKey = getDBMonthKey(tempDate);
+                const hasEvents = DB.events[mKey] && Object.keys(DB.events[mKey]).length > 0;
+                
+                if (!hasEvents && (mRes.totalKM || 0) === 0 && (mRes.totalAjudasManuais || 0) === 0 && (mRes.totalExtras || 0) === 0) {
+                    continue; 
+                }
+
                 res.totalKM += (mRes.totalKM || 0);
                 res.bruto += (mRes.bruto || 0);
                 res.salLiquido += (mRes.salLiquido || 0);
@@ -2089,22 +2099,23 @@
 
             const year = curDate.getFullYear();
             const res = computeYearEngine();
+            const fmt = (v) => `\u20AC ${v.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             document.getElementById('rpt-year-lbl').innerText = year;
 
             document.getElementById('rpt-year-km').innerText = res.totalKM.toLocaleString('pt-PT') + ' km';
 
-            document.getElementById('rpt-year-bruto').innerText = `\u20AC ${res.bruto.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('rpt-year-bruto').innerText = fmt(res.bruto);
 
             const rFixo = document.getElementById('rpt-year-fixo');
-            if (rFixo) rFixo.innerText = `\u20AC ${res.fixoLiquido.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            if (rFixo) rFixo.innerText = fmt(res.fixoLiquido);
 
             const rAjudas = document.getElementById('rpt-year-ajudas');
-            if (rAjudas) rAjudas.innerText = `\u20AC ${res.totalAjudasGeral.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            if (rAjudas) rAjudas.innerText = fmt(res.totalAjudasGeral);
 
-            document.getElementById('rpt-year-extras').innerText = `\u20AC ${res.totalExtras.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('rpt-year-extras').innerText = fmt(res.totalExtras);
 
-            document.getElementById('rpt-year-final').innerText = `\u20AC ${res.finalLiquidoReceber.toLocaleString('pt-PT', { minimumFractionDigits: 2 })}`;
+            document.getElementById('rpt-year-final').innerText = fmt(res.finalLiquidoReceber);
 
             const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
