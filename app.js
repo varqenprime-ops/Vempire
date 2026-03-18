@@ -103,7 +103,7 @@
                 diuValor: 24.63,        // Valor unit\u00E1rio por diuturnidade
 
                 complementoFixo: 0,     // Complemento fixo (Cisterna)
-
+                complementoTir: 135.00,  // Prémio TIR / Cláusula 75 (Pode ser manual)
                 base: 1014.02,
 
                 theme: 'dark',
@@ -258,7 +258,7 @@
 
             const compPerc = legalBaseForC61 * percC;
 
-            const c75 = C75_VALORES[DB.config.tabela] || 0; // Cl\u00E1usula 75 Ib\u00E9rica/Internacional
+            const c75 = DB.config.complementoTir || 0; // Prémio TIR / Cláusula 75 (Manual)
 
             // C61 incide sobre (Base Legal + Diuturnidades + Complementos)
 
@@ -710,32 +710,21 @@
 
             // Bind config inputs
 
-            ['nome', 'matricula', 'civil', 'filhos', 'base', 'tabela'].forEach(k => {
-
-                let el = document.getElementById('cfg-' + k);
-
+            ['nome', 'matricula', 'civil', 'filhos', 'base', 'tabela', 'complementoTir'].forEach(k => {
+                let elId = 'cfg-' + k;
+                if (k === 'complementoTir') elId = 'cfg-tir';
+                let el = document.getElementById(elId);
                 if (!el) return;
-
                 let val = DB.config[k] ?? defaultDB.config[k];
-
                 if (el.type === 'number') el.value = val;
-
                 else el.value = val || '';
-
                 el.oninput = () => {
-
                     DB.config[k] = el.type === 'number' ? +el.value : el.value;
-
                     DB_SAVE();
-
                     updateFixoUI();
-
                     renderEngine();
-
                     refreshHeader();
-
                 };
-
             });
 
             refreshHeader();
@@ -1260,7 +1249,9 @@
 
             set('lbl-comp-c61', '\u20AC ' + fmt(c61));
 
-            set('lbl-comp-c75', '\u20AC ' + fmt(calcSalary().c75));
+            set('lbl-comp-c75', '\u20AC ' + fmt(s.c75));
+            const c75Label = document.querySelector('#lbl-c75-row .setting-label');
+            if (c75Label) c75Label.innerText = "Cl\u00E1usula TIR / Complemento";
 
             set('lbl-comp-perc', '\u20AC ' + fmt(complementoPerc));
 
