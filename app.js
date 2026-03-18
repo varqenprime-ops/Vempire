@@ -1249,6 +1249,7 @@
 
             set('lbl-comp-c61', '\u20AC ' + fmt(c61));
 
+            const s = calcSalary();
             set('lbl-comp-c75', '\u20AC ' + fmt(s.c75));
             const c75Label = document.querySelector('#lbl-c75-row .setting-label');
             if (c75Label) c75Label.innerText = "Cl\u00E1usula TIR / Complemento";
@@ -1274,8 +1275,6 @@
             // SUBSÍDIOS (Duod\u00E9cimos ou Integrais)
 
             const isDuoOn = !!DB.config.duoEnabled;
-
-            const s = calcSalary();
 
             const duoBrutoBlock = document.getElementById('duo-bruto-block');
 
