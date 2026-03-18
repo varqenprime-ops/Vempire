@@ -1912,28 +1912,27 @@
 
             const nightBonusReal = totalNightHoursMonth * (base / 173.33) * 0.25;
 
-            // Ganhos KM (L_KM_LIMIT = 1500, L_KM_R1 = 0.10, L_KM_R2 = 0.20)
-
-            const L_KM_LIMIT_FIN = 1500;
-
-            const L_KM_R1_FIN = 0.10;
-
-            const L_KM_R2_FIN = 0.20;
-
             let totalKmGains = 0;
-
-            if (DB.config.kmEnabled) {
-
-                if (totalKM <= L_KM_LIMIT_FIN) {
-
-                    totalKmGains = totalKM * L_KM_R1_FIN;
-
-                } else {
-
-                    totalKmGains = (L_KM_LIMIT_FIN * L_KM_R1_FIN) + ((totalKM - L_KM_LIMIT_FIN) * L_KM_R2_FIN);
-
+            if (DB.config.kmEnabled && DB.config.kmEscaloes && DB.config.kmEscaloes.length > 0) {
+                // Ordenar por limite para garantir cálculo correto
+                const sortedTiers = [...DB.config.kmEscaloes].sort((a, b) => a.ate - b.ate);
+                let kmRemaining = totalKM;
+                let prevLimit = 0;
+                for (const tier of sortedTiers) {
+                    if (kmRemaining <= 0) break;
+                    let tierRange = tier.ate - prevLimit;
+                    let kmInTier = Math.min(kmRemaining, tierRange);
+                    totalKmGains += kmInTier * (tier.valor || 0);
+                    kmRemaining -= kmInTier;
+                    prevLimit = tier.ate;
                 }
-
+            } else if (DB.config.kmEnabled) {
+                // Fallback (legado)
+                if (totalKM <= 1500) {
+                    totalKmGains = totalKM * 0.10;
+                } else {
+                    totalKmGains = (1500 * 0.10) + ((totalKM - 1500) * 0.20);
+                }
             }
 
             // GAVETA 1: Sal\u00E1rio Mensal
