@@ -617,11 +617,11 @@ canvas {
 .mgmt-table th { color: var(--text-muted); font-size: 0.75rem; text-align: left; padding: 12px 10px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
 .mgmt-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 10px 12px;
-    color: white;
+    color: var(--text-main);
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 700;
@@ -632,7 +632,7 @@ canvas {
 
 .mgmt-input:focus {
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--surface);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 

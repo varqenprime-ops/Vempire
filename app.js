@@ -267,7 +267,7 @@
 
             const cisterna = cisternaOn ? L_CISTERNA : 0;
 
-            const adr = adrOn ? (22 * L_ADR_DIARIO) : 0;
+            const adr = adrOn ? (DB.config.adrMensal || 176.88) : 0;
 
             const operacoes = 0; // Calculado no calend\u00E1rio
 
@@ -719,7 +719,6 @@
                     DB.config[k] = el.type === 'number' ? +el.value : el.value;
                     DB_SAVE();
                     updateFixoUI();
-                    renderEngine();
                     refreshHeader();
                 };
             });
@@ -900,9 +899,9 @@
 
             }
 
-            document.getElementById('mo-prev').onclick = () => { curDate.setMonth(curDate.getMonth() - 1); buildCalendar(); updateFixoUI(); };
+            document.getElementById('mo-prev').onclick = () => { curDate.setMonth(curDate.getMonth() - 1); buildCalendar(); };
 
-            document.getElementById('mo-next').onclick = () => { curDate.setMonth(curDate.getMonth() + 1); buildCalendar(); updateFixoUI(); };
+            document.getElementById('mo-next').onclick = () => { curDate.setMonth(curDate.getMonth() + 1); buildCalendar(); };
 
             buildCalendar();
 
@@ -1205,64 +1204,30 @@
         }
 
         function updateFixoUI() {
-
-            // ── Recalculate all components ──
-
-            let base = DB.config.base || L_BASE;
-
-            let legalBaseForC61 = DB.config.tabela ? TABELAS[DB.config.tabela].base : L_BASE;
-
-            let diuValor = DB.config.diuValor !== undefined ? DB.config.diuValor : L_DIUTURNIDADE;
-
-            let diutVal = (DB.config.diuturnidades || 0) * diuValor;
-
-            let percC = (DB.config.heavyVehicle ? COMPLEMENTOS_PESADOS[DB.config.tabela] : COMPLEMENTOS[DB.config.tabela]) || 0.02;
-            let complementoPerc = legalBaseForC61 * percC;
-            let c61 = (legalBaseForC61 + diutVal + complementoPerc) * L_C61_PERC;
-            let noturno = DB.config.noturnoEnabled ? L_NOTURNO_FIXO : 0;
-
-            let adrM = DB.config.adrEnabled ? (22 * L_ADR_DIARIO) : 0;
-
-            let cisternaM = DB.config.cisternaEnabled ? L_CISTERNA : 0;
-
-            let bruto = getTotalBruto();
-
-            let duo = getDuodecimos();
-
-            let rate = getIRSRate();
-
-            let liquido = getFixoLiquido();
+            // ── Recalculate once ──
+            const s = calcSalary();
 
             const fmt = (v) => v.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
             const set = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
 
             // ── Componentes do Bruto ──
-
-            set('lbl-comp-diu', '\u20AC ' + fmt(diutVal));
-
-            set('lbl-comp-c61', '\u20AC ' + fmt(c61));
-
-            const s = calcSalary();
+            set('lbl-comp-diu', '\u20AC ' + fmt(s.diuturnidades));
+            set('lbl-comp-c61', '\u20AC ' + fmt(s.c61));
             set('lbl-comp-c75', '\u20AC ' + fmt(s.c75));
             const c75Label = document.querySelector('#lbl-c75-row .setting-label');
             if (c75Label) c75Label.innerText = "Cl\u00E1usula TIR / Complemento";
 
-            set('lbl-comp-perc', '\u20AC ' + fmt(complementoPerc));
+            set('lbl-comp-perc', '\u20AC ' + fmt(s.compPerc));
 
             if (DB.config.noturnoEnabled) {
-
-                set('lbl-comp-noturno', '\u20AC ' + fmt(noturno));
-
+                set('lbl-comp-noturno', '\u20AC ' + fmt(s.noturno));
             } else {
-
                 set('lbl-comp-noturno', 'Modo Real (Vari\u00E1vel)');
-
             }
 
-            set('lbl-comp-adr', '\u20AC ' + fmt(adrM));
+            set('lbl-comp-adr', '\u20AC ' + fmt(s.adr));
 
-            set('lbl-comp-cisterna', '\u20AC ' + fmt(cisternaM));
+            set('lbl-comp-cisterna', '\u20AC ' + fmt(s.cisterna));
 
             // Duod\u00E9cimos Brutos
 
@@ -1302,11 +1267,11 @@
 
             const adrRow2 = document.getElementById('lbl-adr-row');
 
-            if (adrRow2) adrRow2.classList.toggle('hidden', adrM === 0);
+            if (adrRow2) adrRow2.classList.toggle('hidden', s.adr === 0);
 
             const cisternaRow = document.getElementById('lbl-cisterna-row');
 
-            if (cisternaRow) cisternaRow.classList.toggle('hidden', cisternaM === 0);
+            if (cisternaRow) cisternaRow.classList.toggle('hidden', s.cisterna === 0);
 
             const c75Row = document.getElementById('lbl-c75-row');
 
@@ -1314,11 +1279,11 @@
 
             // ── Descontos ──
 
-            set('lbl-ss', '- \u20AC ' + fmt(bruto * 0.11));
+            set('lbl-ss', '- \u20AC ' + fmt(s.bruto * 0.11));
 
-            set('lbl-irs-rate', (rate * 100).toFixed(1));
+            set('lbl-irs-rate', (s.irsRate * 100).toFixed(1));
 
-            set('lbl-irs', '- \u20AC ' + fmt(bruto * rate));
+            set('lbl-irs', '- \u20AC ' + fmt(s.bruto * s.irsRate));
 
             // Descontos Subs\u00EDdios
 
@@ -1336,17 +1301,17 @@
 
                 set('lbl-duo-ss', '- \u20AC ' + fmt(s.duoTotal * 0.11));
 
-                set('lbl-duo-irs', '- \u20AC ' + fmt(s.duoTotal * rate));
+                set('lbl-duo-irs', '- \u20AC ' + fmt(s.duoTotal * s.irsRate));
 
             }
 
             // ── L\u00EDquido ──
 
-            set('lbl-fixo-liq', '\u20AC ' + fmt(liquido.total));
+            set('lbl-fixo-liq', '\u20AC ' + fmt(s.liquidoTotal));
 
             const hdrF = document.getElementById('hdr-fixo');
 
-            if (hdrF) hdrF.innerText = '\u20AC ' + fmt(liquido.total);
+            if (hdrF) hdrF.innerText = '\u20AC ' + fmt(s.liquidoTotal);
 
             renderEngine();
 
@@ -1934,11 +1899,13 @@
 
             // GAVETA 1: Sal\u00E1rio Mensal
 
-            let brutoBase = getTotalBruto(workingDate);
+            const salaryData = calcSalary(workingDate);
+
+            let brutoBase = salaryData.bruto;
 
             let bruto = brutoBase + nightBonusReal; // Adiciona b\u00F3nus noturno real se for o caso
 
-            let rate = getIRSRate(workingDate);
+            let rate = salaryData.irsRate;
 
             let ss1 = bruto * 0.11;
 
@@ -1948,7 +1915,7 @@
 
             // GAVETA 2: Duod\u00E9cimos
 
-            let duo = getDuodecimos(workingDate);
+            let duo = { natal: salaryData.duoNatal, ferias: salaryData.duoFerias, total: salaryData.duoTotal };
 
             let ss2 = duo.total * 0.11;
 
