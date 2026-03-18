@@ -1216,13 +1216,10 @@
 
             let diutVal = (DB.config.diuturnidades || 0) * diuValor;
 
-            let c61 = (legalBaseForC61 + diutVal) * L_C61_PERC;
-
-            let noturno = DB.config.noturnoEnabled ? L_NOTURNO_FIXO : 0;
-
             let percC = (DB.config.heavyVehicle ? COMPLEMENTOS_PESADOS[DB.config.tabela] : COMPLEMENTOS[DB.config.tabela]) || 0.02;
-
             let complementoPerc = legalBaseForC61 * percC;
+            let c61 = (legalBaseForC61 + diutVal + complementoPerc) * L_C61_PERC;
+            let noturno = DB.config.noturnoEnabled ? L_NOTURNO_FIXO : 0;
 
             let adrM = DB.config.adrEnabled ? (22 * L_ADR_DIARIO) : 0;
 
