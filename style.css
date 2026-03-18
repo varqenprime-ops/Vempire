@@ -443,6 +443,7 @@ body {
     z-index: 2000;
     display: flex;
     align-items: flex-end;
+    cursor: pointer;
 }
 
 .modal {
@@ -503,11 +504,11 @@ body {
 .modal input[type="number"], 
 .modal input[type="text"] {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 12px;
-    color: white;
+    color: var(--text-main);
     font-family: inherit;
     font-size: 1rem;
     font-weight: 700;
@@ -519,9 +520,10 @@ body {
 
 .modal input:focus {
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--surface-alt);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
+
 
 .minput-row {
     display: flex;

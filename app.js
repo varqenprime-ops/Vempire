@@ -2596,10 +2596,26 @@
         })();
 
         function toggleSidebar() {
-
             document.querySelector('.sidebar').classList.toggle('show');
-
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (backdrop) {
+                backdrop.classList.toggle('hidden');
+            }
         }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                const modalId = e.target.id;
+                if (modalId === 'modal-settings') {
+                    closeSettingsModal();
+                } else if (modalId === 'modal-select') {
+                    if (typeof closeModal === 'function') closeModal();
+                    else e.target.classList.add('hidden');
+                } else {
+                    e.target.classList.add('hidden');
+                }
+            }
+        });
 
     
 
