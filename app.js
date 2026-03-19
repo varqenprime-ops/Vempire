@@ -1733,6 +1733,9 @@
                 let evt = events[d];
 
                 if (evt) {
+                    if (evt.kmTotal > 0) {
+                        btn.innerHTML += `<div class="day-km-tag">${evt.kmTotal}</div>`;
+                    }
 
                     if (evt.emojis && evt.emojis.length > 0) {
 

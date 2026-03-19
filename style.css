@@ -398,6 +398,22 @@ body {
     border-radius: 50%;
 }
 
+.day-km-tag {
+    position: absolute;
+    top: 5px;
+    left: 6px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--yellow);
+    opacity: 0.9;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.light-mode .day-km-tag {
+    color: #b45309; /* Um laranja mais escuro para ler melhor no branco */
+}
+
 /* Forms and Inputs */
 .setting-row {
     display: flex;
