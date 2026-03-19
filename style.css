@@ -387,15 +387,18 @@ body {
 
 .day-multi-dots {
     position: absolute;
-    bottom: 6px;
+    bottom: 8px;
     display: flex;
-    gap: 2px;
+    gap: 3px;
+    justify-content: center;
+    width: 100%;
 }
 
 .dot {
-    width: 5px;
-    height: 5px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .day-km-tag {
