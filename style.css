@@ -357,22 +357,22 @@ body {
 .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    gap: 10px;
 }
 
 .day {
-    aspect-ratio: 1 / 1.4; /* Muito mais alto agora para se notar logo */
+    aspect-ratio: 1 / 1.7; /* Altura máxima para os dias serem imponentes */
     border-radius: 12px;
     background: var(--surface-alt);
     color: var(--text-main);
     font-weight: 800;
-    font-size: 1.2rem; /* Aumentado o número mais um pouco */
+    font-size: 1.3rem; /* Número bem visível */
     position: relative;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--border); /* Borda mais grossa para destacar */
+    border: 2px solid var(--border);
     transition: transform 0.1s;
 }
 
@@ -859,16 +859,18 @@ canvas {
 
     .card,
     .calendar-card {
-        margin: 0 16px 16px;
+        margin: 0 8px 16px;
         padding: 20px;
-        border-radius: 24px;
+        border-radius: 20px;
     }
 
     .section-title {
-        margin: 0 24px 12px;
+        margin: 0 16px 12px;
     }
 
     .day {
         border-radius: 10px;
+        aspect-ratio: 1 / 1.7;
+        font-size: 1.3rem;
     }
 }
