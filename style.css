@@ -861,18 +861,18 @@ canvas {
     }
 
     .calendar-card {
-        margin: 0 4px 16px;
-        padding: 10px;
-        border-radius: 18px;
+        margin: 0 0 16px;
+        padding: 5px;
+        border-radius: 12px; /* Cantos mais suaves para a largura total */
     }
 
     .cal-grid {
-        gap: 4px;
+        gap: 2px;
     }
 
     .day {
-        border-radius: 10px;
+        border-radius: 8px;
         aspect-ratio: 1 / 1.7;
-        font-size: 1.3rem;
+        font-size: 1.35rem;
     }
 }
