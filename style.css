@@ -361,18 +361,18 @@ body {
 }
 
 .day {
-    aspect-ratio: 1;
-    border-radius: 14px;
+    aspect-ratio: 1 / 1.4; /* Muito mais alto agora para se notar logo */
+    border-radius: 12px;
     background: var(--surface-alt);
     color: var(--text-main);
-    font-weight: 700;
-    font-size: 1rem;
+    font-weight: 800;
+    font-size: 1.2rem; /* Aumentado o número mais um pouco */
     position: relative;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--border);
+    border: 2px solid var(--border); /* Borda mais grossa para destacar */
     transition: transform 0.1s;
 }
 
