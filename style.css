@@ -396,16 +396,16 @@ body {
     position: absolute;
     bottom: 7px;
     display: flex;
-    gap: 4px;
+    gap: 3px;
     justify-content: center;
     width: 100%;
 }
 
 .dot {
-    width: 12px;
-    height: 12px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .day-km-tag {
