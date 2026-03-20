@@ -288,16 +288,16 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 12px 24px;
-    background: rgba(11, 14, 20, 0.85); /* Tom escuro semi-transparente */
+    background: rgba(11, 14, 20, 0.98);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     transition: all 0.3s;
 }
 
 .light-mode .topbar {
-    background: rgba(248, 250, 252, 0.85); /* Tom claro semi-transparente */
+    background: rgba(248, 250, 252, 0.98);
 }
 
 .mobile-menu-toggle {
@@ -324,6 +324,25 @@ body {
 
 .btn-settings:active {
     transform: scale(0.95);
+}
+
+.top-banner-info {
+    background: var(--accent);
+    color: white;
+    text-align: center;
+    padding: 12px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    border-radius: 16px;
+    margin: 0 24px 24px;
+    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+    transition: all 0.3s;
+}
+
+@media (max-width: 600px) {
+    .top-banner-info {
+        margin: 0 4px 24px;
+    }
 }
 
 .header-title {
