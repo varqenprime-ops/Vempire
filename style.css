@@ -860,15 +860,14 @@ canvas {
         font-size: 1.5rem;
     }
 
-    .card,
     .calendar-card {
-        margin: 0 8px 16px;
-        padding: 20px;
-        border-radius: 20px;
+        margin: 0 4px 16px;
+        padding: 10px;
+        border-radius: 18px;
     }
 
-    .section-title {
-        margin: 0 16px 12px;
+    .cal-grid {
+        gap: 4px;
     }
 
     .day {
