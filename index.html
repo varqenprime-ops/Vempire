@@ -6,7 +6,8 @@
 
     <meta charset="UTF-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
     <meta name="apple-mobile-web-app-capable" content="yes" />
 
@@ -38,7 +39,7 @@
 
     </script>
 
-    <link rel="stylesheet" href="style.css?v=180">
+    <link rel="stylesheet" href="style.css?v=210">
 
 </head>
 
@@ -58,7 +59,8 @@
 
                 <input type="text" id="l-email" placeholder="O teu nome ou email" autocomplete="username" />
 
-                <input type="password" id="l-password" placeholder="Senha (mínimo 4 caract.)" autocomplete="current-password" />
+                <input type="password" id="l-password" placeholder="Senha (mínimo 4 caract.)"
+                    autocomplete="current-password" />
 
             </div>
 
@@ -71,20 +73,23 @@
     <!-- ONBOARDING -->
 
     <div id="onboarding-overlay" class="hidden"
-
         style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,14,20,0.9);z-index:10000;display:flex;justify-content:center;align-items:center;padding:24px;backdrop-filter:blur(20px);">
 
-        <div class="card" style="width:100%;max-width:440px;background:rgba(255,255,255,0.03);padding:40px;border-radius:40px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);margin:0;">
+        <div class="card"
+            style="width:100%;max-width:440px;background:rgba(255,255,255,0.03);padding:40px;border-radius:40px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);margin:0;">
 
-            <h2 style="margin-bottom:16px;color:white;font-weight:800;font-size:1.8rem;letter-spacing:-1px;">Bem-vindo! 🚀</h2>
+            <h2 style="margin-bottom:16px;color:white;font-weight:800;font-size:1.8rem;letter-spacing:-1px;">Bem-vindo!
+                🚀</h2>
 
-            <p style="font-size:0.95rem;color:var(--text-muted);margin-bottom:32px;line-height:1.5;">Configura o teu perfil para começar.</p>
+            <p style="font-size:0.95rem;color:var(--text-muted);margin-bottom:32px;line-height:1.5;">Configura o teu
+                perfil para começar.</p>
 
             <div class="setting-row" style="margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.05);">
 
                 <span class="setting-label">Nome Motorista</span>
 
-                <input type="text" id="onb-nome" class="setting-input" placeholder="O teu nome" style="text-align:right;width:180px;" />
+                <input type="text" id="onb-nome" class="setting-input" placeholder="O teu nome"
+                    style="text-align:right;width:180px;" />
 
             </div>
 
@@ -92,7 +97,8 @@
 
                 <span class="setting-label">Matrícula</span>
 
-                <input type="text" id="onb-matricula" class="setting-input" placeholder="AA-00-BB" style="text-align:right;width:180px;" />
+                <input type="text" id="onb-matricula" class="setting-input" placeholder="AA-00-BB"
+                    style="text-align:right;width:180px;" />
 
             </div>
 
@@ -114,11 +120,14 @@
 
                 <span class="setting-label">Filhos Dependentes</span>
 
-                <input type="number" id="onb-filhos" class="setting-input" value="0" min="0" style="text-align:right;width:80px;" />
+                <input type="number" id="onb-filhos" class="setting-input" value="0" min="0"
+                    style="text-align:right;width:80px;" />
 
             </div>
 
-            <div id="onb-error" style="color:#ff5555;font-size:0.85rem;font-weight:700;margin-bottom:20px;text-align:center;display:none;">⚠️ Preenche o Nome e a Matrícula.</div>
+            <div id="onb-error"
+                style="color:#ff5555;font-size:0.85rem;font-weight:700;margin-bottom:20px;text-align:center;display:none;">
+                ⚠️ Preenche o Nome e a Matrícula.</div>
 
             <button id="btn-save-onboarding" class="btn-go" style="margin-top:0;">Concluir Configuração</button>
 
@@ -180,25 +189,31 @@
 
             <div class="app-container">
 
-                <header class="topbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 24px;">
+                <header class="topbar"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 24px;">
 
                     <div style="display: flex; align-items: center; gap: 15px;">
 
-                        <div class="mobile-menu-toggle" onclick="toggleSidebar()" style="margin: 0; padding: 0; font-size: 1.8rem;">☰</div>
+                        <div class="mobile-menu-toggle" onclick="toggleSidebar()"
+                            style="margin: 0; padding: 0; font-size: 1.8rem;">☰</div>
 
-                        <div class="header-title" id="main-view-title" style="margin: 0; font-size: 1.8rem;">Perfil</div>
+                        <div class="header-title" id="main-view-title" style="margin: 0; font-size: 1.8rem;">Perfil
+                        </div>
 
                     </div>
 
-                    <div onclick="openSettingsModal()" style="width: 42px; height: 42px; background: var(--accent-pink); border-radius: 12px; display:flex; align-items:center; justify-content:center; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">⚙️</div>
+                    <div onclick="openSettingsModal()"
+                        style="width: 42px; height: 42px; background: var(--accent-pink); border-radius: 12px; display:flex; align-items:center; justify-content:center; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);"
+                        onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">⚙️
+                    </div>
 
                 </header>
 
                 <div id="top-banner-info"
-
                     style="background: var(--accent); color: white; text-align: center; padding: 12px; font-weight: 800; font-size: 0.9rem; border-radius: 16px; margin: 0 24px 24px; box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);">
 
-                    <span id="hdr-driver-name-text">Motorista: ...</span> — <span id="hdr-truck-plate-text">Matrícula: ...</span>
+                    <span id="hdr-driver-name-text">Motorista: ...</span> — <span id="hdr-truck-plate-text">Matrícula:
+                        ...</span>
 
                 </div>
 
@@ -249,19 +264,16 @@
                             Clica num dos 6 slots abaixo e depois escolhe um emoji da lista para o substituir:</p>
 
                         <div id="emoji-slots-grid" class="emoji-grid"
-
                             style="margin-bottom: 16px; grid-template-columns: repeat(6, 1fr);">
 
                         </div>
 
                         <p id="emoji-palette-label" class="hidden"
-
                             style="font-size: 0.75rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">
 
                             Lista de Escolha:</p>
 
                         <div id="emoji-palette" class="hidden"
-
                             style="display: none; flex-wrap: wrap; gap: 8px; font-size: 1.4rem;">
 
                         </div>
@@ -335,7 +347,6 @@
                             <span class="setting-label">N.º Diuturnidades</span>
 
                             <input type="number" id="cfg-diuturnidades" class="setting-input" value="0" min="0"
-
                                 max="10" />
 
                         </div>
@@ -345,7 +356,6 @@
                             <div class="setting-label">
 
                                 Valor da Diuturnidade <small id="rs-diu-valor" class="hidden"
-
                                     onclick="resetToLaw('diuValor')">Repor (24.63€)</small></div>
 
                             <input type="number" id="cfg-diuValor" class="setting-input" step="0.01" />
@@ -409,7 +419,6 @@
                         </div>
 
                         <div id="sub-months-block" class="hidden"
-
                             style="margin-top: 10px; padding-left: 10px; border-left: 2px solid var(--accent);">
 
                             <div class="setting-row" style="padding: 5px 0;">
@@ -417,7 +426,6 @@
                                 <span class="setting-label" style="font-size: 0.8rem;">Mês Subsídio Férias</span>
 
                                 <select id="cfg-subFeriasMonth" class="setting-input"
-
                                     style="width: auto; padding: 2px 5px;">
 
                                     <option value="0">Janeiro</option>
@@ -452,7 +460,8 @@
 
                                 <span class="setting-label" style="font-size: 0.8rem;">Mês Subsídio Natal</span>
 
-                                <select id="cfg-subNatalMonth" class="setting-input" style="width: auto; padding: 2px 5px;">
+                                <select id="cfg-subNatalMonth" class="setting-input"
+                                    style="width: auto; padding: 2px 5px;">
 
                                     <option value="0">Janeiro</option>
 
@@ -495,7 +504,8 @@
                         <div class="setting-row">
                             <div class="setting-label">
                                 Vencimento Base (€)
-                                <small id="rs-base" class="hidden" onclick="resetToLaw('base')">Repor Lei (1.014,02€)</small>
+                                <small id="rs-base" class="hidden" onclick="resetToLaw('base')">Repor Lei
+                                    (1.014,02€)</small>
                             </div>
                             <input type="number" id="cfg-base" class="setting-input" value="1014.02" step="0.01" />
                         </div>
@@ -504,7 +514,6 @@
                         <!-- COMPONENTES CALCULADOS (Leitura) -->
 
                         <p
-
                             style="font-size: 0.72rem; font-weight:800; letter-spacing:0.06em; color:var(--text-muted); margin:14px 0 6px; text-transform:uppercase;">
 
                             📊 Componentes do Bruto</p>
@@ -513,15 +522,18 @@
 
                             <span class="setting-label" style="font-size:0.85rem;">Diuturnidades</span>
 
-                            <span id="lbl-comp-diu" style="font-size:0.9rem; font-weight:700; color:var(--blue);">€ 0,00</span>
+                            <span id="lbl-comp-diu" style="font-size:0.9rem; font-weight:700; color:var(--blue);">€
+                                0,00</span>
 
                         </div>
 
                         <div class="setting-row" style="padding: 3px 0;">
 
-                            <span class="setting-label" style="font-size:0.85rem;">Prestação Pecuniária 61.ª (50%)</span>
+                            <span class="setting-label" style="font-size:0.85rem;">Prestação Pecuniária 61.ª
+                                (50%)</span>
 
-                            <span id="lbl-comp-c61" style="font-size:0.9rem; font-weight:700; color:var(--blue);">€ 0,00</span>
+                            <span id="lbl-comp-c61" style="font-size:0.9rem; font-weight:700; color:var(--blue);">€
+                                0,00</span>
 
                         </div>
 
@@ -529,7 +541,8 @@
 
                             <span class="setting-label" style="font-size:0.85rem;">Cláusula 75.ª (Iber/Int)</span>
 
-                            <span id="lbl-comp-c75" style="font-size:0.9rem; font-weight:700; color:var(--blue);">€ 0,00</span>
+                            <span id="lbl-comp-c75" style="font-size:0.9rem; font-weight:700; color:var(--blue);">€
+                                0,00</span>
 
                         </div>
 
@@ -537,7 +550,8 @@
 
                             <span class="setting-label" style="font-size:0.85rem;">Complemento Salarial 59.ª (5%)</span>
 
-                            <span id="lbl-comp-perc" style="font-size:0.9rem; font-weight:700; color:var(--blue);">€ 0,00</span>
+                            <span id="lbl-comp-perc" style="font-size:0.9rem; font-weight:700; color:var(--blue);">€
+                                0,00</span>
 
                         </div>
 
@@ -555,7 +569,8 @@
 
                             <span class="setting-label" style="font-size:0.85rem;">ADR Mensal</span>
 
-                            <span id="lbl-comp-adr" style="font-size:0.9rem; font-weight:700; color:#f97316;">€ 0,00</span>
+                            <span id="lbl-comp-adr" style="font-size:0.9rem; font-weight:700; color:#f97316;">€
+                                0,00</span>
 
                         </div>
 
@@ -563,7 +578,8 @@
 
                             <span class="setting-label" style="font-size:0.85rem;">Cisterna</span>
 
-                            <span id="lbl-comp-cisterna" style="font-size:0.9rem; font-weight:700; color:#f97316;">€ 0,00</span>
+                            <span id="lbl-comp-cisterna" style="font-size:0.9rem; font-weight:700; color:#f97316;">€
+                                0,00</span>
 
                         </div>
 
@@ -572,7 +588,6 @@
                         <div id="duo-bruto-block" class="hidden">
 
                             <p id="sub-title-label"
-
                                 style="font-size: 0.72rem; font-weight:800; letter-spacing:0.06em; color:#a855f7; margin:14px 0 6px; text-transform:uppercase;">
 
                                 🎁🥗 Duodécimos / Mês</p>
@@ -591,7 +606,8 @@
 
                                 <span class="setting-label" style="font-size:0.85rem;">Sub. Natal (Bruto)</span>
 
-                                <span id="lbl-duo-natal" style="font-size:0.9rem; font-weight:700; color:#a855f7;">€ 0,00</span>
+                                <span id="lbl-duo-natal" style="font-size:0.9rem; font-weight:700; color:#a855f7;">€
+                                    0,00</span>
 
                             </div>
 
@@ -599,7 +615,8 @@
 
                         <!-- BRUTO TOTAL -->
 
-                        <div class="setting-row" style="border-top:1px solid var(--border); margin-top:8px; padding-top:10px;">
+                        <div class="setting-row"
+                            style="border-top:1px solid var(--border); margin-top:8px; padding-top:10px;">
 
                             <span class="setting-label" style="font-weight:700;">Bruto Total Mensal</span>
 
@@ -610,7 +627,6 @@
                         <!-- DESCONTOS -->
 
                         <p
-
                             style="font-size: 0.72rem; font-weight:800; letter-spacing:0.06em; color:var(--red); margin:14px 0 6px; text-transform:uppercase;">
 
                             📉 Descontos</p>
@@ -626,7 +642,6 @@
                         <div class="setting-row" style="padding: 3px 0;">
 
                             <span class="setting-label" style="font-size:0.85rem;">Retenção IRS Aprox. (<span
-
                                     id="lbl-irs-rate">0</span>%)</span>
 
                             <span id="lbl-irs" style="font-size:1rem; font-weight:800; color:var(--red);">- 0,00</span>
@@ -638,7 +653,6 @@
                         <div id="duo-desc-block" class="hidden">
 
                             <p id="sub-desc-title-label"
-
                                 style="font-size: 0.72rem; font-weight:800; letter-spacing:0.06em; color:#a855f7; margin:14px 0 6px; text-transform:uppercase;">
 
                                 Descontos dos Duodécimos</p>
@@ -647,7 +661,8 @@
 
                                 <span class="setting-label" style="font-size:0.85rem;">Segurança Social (11%)</span>
 
-                                <span id="lbl-duo-ss" style="font-size:1rem; font-weight:800; color:#a855f7;">- 0,00</span>
+                                <span id="lbl-duo-ss" style="font-size:1rem; font-weight:800; color:#a855f7;">-
+                                    0,00</span>
 
                             </div>
 
@@ -655,7 +670,8 @@
 
                                 <span class="setting-label" style="font-size:0.85rem;">Retenção IRS Aprox.</span>
 
-                                <span id="lbl-duo-irs" style="font-size:1rem; font-weight:800; color:#a855f7;">- 0,00</span>
+                                <span id="lbl-duo-irs" style="font-size:1rem; font-weight:800; color:#a855f7;">-
+                                    0,00</span>
 
                             </div>
 
@@ -663,13 +679,15 @@
 
                         <!-- LÍQUIDO MENSAL TOTAL -->
 
-                        <div class="setting-row" style="padding-top:20px; margin-top:8px; border-top:2px dashed var(--border);">
+                        <div class="setting-row"
+                            style="padding-top:20px; margin-top:8px; border-top:2px dashed var(--border);">
 
                             <span style="font-weight:800; color:var(--text-main); font-size:1.1rem;">💰 Líquido Mensal
 
                                 Total</span>
 
-                            <span id="lbl-fixo-liq" style="font-size:1.5rem; font-weight:800; color:var(--green-dark);">€
+                            <span id="lbl-fixo-liq"
+                                style="font-size:1.5rem; font-weight:800; color:var(--green-dark);">€
 
                                 0,00</span>
 
@@ -719,7 +737,8 @@
 
                             <button class="btn-add-row" onclick="addKmEscalao()">+ Novo Escalão</button>
 
-                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Os KM são calculados por
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Os KM são
+                                calculados por
 
                                 patamares. O valor do último patamar aplica-se a tudo o que exceder o limite.</p>
 
@@ -763,12 +782,12 @@
 
                 <div id="view-report" class="hidden">
 
-                    <header class="topbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0 24px;">
+                    <header class="topbar"
+                        style="display: flex; justify-content: space-between; align-items: center; padding: 0 24px;">
 
                         <div class="header-title">Relatório</div>
 
                         <div id="annual-toggle-group"
-
                             style="display: flex; background: var(--bg-card); padding: 4px; border-radius: 12px; border: 1px solid var(--border);">
 
                             <button id="btn-view-month" class="btn-toggle-small active">Mensal</button>
@@ -783,13 +802,15 @@
 
                         <p style="text-align: center; color: var(--text-muted); font-weight: 600; margin-bottom: 24px;">
 
-                            Exporte o relatório mensal detalhado. A visualização no ecrã é um resumo, a exportação para Sheets
+                            Exporte o relatório mensal detalhado. A visualização no ecrã é um resumo, a exportação para
+                            Sheets
 
                             (Excel) conterá todos os detalhes diários.</p>
 
                         <div class="report-actions">
 
-                            <button class="btn-action" style="background: #107c10; color: white;" id="btn-export-csv">Sheets
+                            <button class="btn-action" style="background: #107c10; color: white;"
+                                id="btn-export-csv">Sheets
 
                                 (Excel / CSV)</button>
 
@@ -823,7 +844,8 @@
 
                                 <span class="setting-label">Líquido Fixo</span>
 
-                                <span id="rpt-fixo" style="font-weight:800; font-size: 1.2rem; color: var(--accent-blue);">€ 0.00</span>
+                                <span id="rpt-fixo"
+                                    style="font-weight:800; font-size: 1.2rem; color: var(--accent-blue);">€ 0.00</span>
 
                             </div>
 
@@ -831,7 +853,8 @@
 
                                 <span class="setting-label">Total Ajudas (Pintadas)</span>
 
-                                <span id="rpt-ajudas" style="font-weight:800; font-size: 1.2rem; color: var(--accent);">€ 0.00</span>
+                                <span id="rpt-ajudas"
+                                    style="font-weight:800; font-size: 1.2rem; color: var(--accent);">€ 0.00</span>
 
                             </div>
 
@@ -839,7 +862,8 @@
 
                                 <span class="setting-label">Total Outros (Emojis)</span>
 
-                                <span id="rpt-extras" style="font-weight:800; font-size: 1.2rem; color: var(--accent-pink);">€ 0.00</span>
+                                <span id="rpt-extras"
+                                    style="font-weight:800; font-size: 1.2rem; color: var(--accent-pink);">€ 0.00</span>
 
                             </div>
 
@@ -847,7 +871,8 @@
 
                                 <span class="setting-label">KM</span>
 
-                                <span id="rpt-km-val" style="font-weight:800; font-size: 1.2rem; color: var(--accent-blue);">€ 0.00</span>
+                                <span id="rpt-km-val"
+                                    style="font-weight:800; font-size: 1.2rem; color: var(--accent-blue);">€ 0.00</span>
 
                             </div>
 
@@ -855,15 +880,19 @@
 
                                 <span class="setting-label">🎁/🥗 Duodécimos (Líq.)</span>
 
-                                <span id="rpt-duo-val" style="font-weight:800; font-size: 1.2rem; color: #a855f7;">€ 0.00</span>
+                                <span id="rpt-duo-val" style="font-weight:800; font-size: 1.2rem; color: #a855f7;">€
+                                    0.00</span>
 
                             </div>
 
                             <div class="setting-row" style="padding-top: 16px; border-top: 2px solid var(--border);">
 
-                                <span class="setting-label" style="font-weight: 800; color: var(--text-main);">TOTAL DO MÊS</span>
+                                <span class="setting-label" style="font-weight: 800; color: var(--text-main);">TOTAL DO
+                                    MÊS</span>
 
-                                <span id="rpt-final" style="font-weight:800; font-size: 1.6rem; color: var(--accent-green);">€ 0.00</span>
+                                <span id="rpt-final"
+                                    style="font-weight:800; font-size: 1.6rem; color: var(--accent-green);">€
+                                    0.00</span>
 
                             </div>
 
@@ -875,7 +904,8 @@
 
                         <div class="card">
 
-                            <p style="text-align: center; color: var(--text-muted); font-weight: 600; margin-bottom: 24px;">
+                            <p
+                                style="text-align: center; color: var(--text-muted); font-weight: 600; margin-bottom: 24px;">
 
                                 Resumo Acumulado de <span id="rpt-year-lbl">2026</span></p>
 
@@ -898,11 +928,13 @@
                             </div>
                             <div class="setting-row">
                                 <span class="setting-label">Líquido Fixo (Total)</span>
-                                <span id="rpt-year-fixo" style="font-weight:800; font-size: 1.2rem; color: var(--accent-blue);">€ 0.00</span>
+                                <span id="rpt-year-fixo"
+                                    style="font-weight:800; font-size: 1.2rem; color: var(--accent-blue);">€ 0.00</span>
                             </div>
                             <div class="setting-row">
                                 <span class="setting-label">Total Ajudas (Pintadas)</span>
-                                <span id="rpt-year-ajudas" style="font-weight:800; font-size: 1.2rem; color: var(--accent);">€ 0.00</span>
+                                <span id="rpt-year-ajudas"
+                                    style="font-weight:800; font-size: 1.2rem; color: var(--accent);">€ 0.00</span>
                             </div>
 
                             <div class="setting-row">
@@ -917,12 +949,12 @@
 
                             <div class="setting-row" style="padding-top: 16px; border-top: 2px solid var(--border);">
 
-                                <span class="setting-label" style="font-weight: 800; color: var(--text-main);">Total Líquido
+                                <span class="setting-label" style="font-weight: 800; color: var(--text-main);">Total
+                                    Líquido
 
                                     Anual</span>
 
                                 <span id="rpt-year-final"
-
                                     style="font-weight:800; font-size: 1.6rem; color: var(--green-dark);">€ 0.00</span>
 
                             </div>
@@ -947,7 +979,8 @@
 
                     <div class="card" style="padding: 20px; margin-bottom: 100px;">
 
-                        <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: var(--text-main);">Produção Semanal</h3>
+                        <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: var(--text-main);">Produção Semanal
+                        </h3>
 
                         <div style="height: 250px; position: relative;">
 
@@ -973,18 +1006,21 @@
 
             <h3 id="modal-title">Dia 1</h3>
 
-            <p style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin-top:25px;">Estado do Dia</p>
+            <p
+                style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin-top:25px;">
+                Estado do Dia</p>
 
             <div id="modal-marker-list" class="marker-grid"></div>
 
-            <p style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin-top:25px; margin-bottom:15px;">Dados do Dia</p>
+            <p
+                style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; margin-top:25px; margin-bottom:15px;">
+                Dados do Dia</p>
 
             <div class="modal-inputs">
 
                 <div id="m-night-block" class="hidden">
 
                     <p
-
                         style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-top: 12px; margin-bottom:8px;">
 
                         Horas do Turno (Modo Real):</p>
@@ -1008,21 +1044,27 @@
                 </div>
 
                 <div id="m-km-block" style="margin-top: 25px;">
-                        <div class="minput-row">
-                            <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">KM Percorridos</span>
-                            <input type="number" id="m-km-total-input" placeholder="0" style="max-width: 140px; margin-top:0;" />
+                    <div class="minput-row">
+                        <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">KM
+                            Percorridos</span>
+                        <input type="number" id="m-km-total-input" placeholder="0"
+                            style="max-width: 140px; margin-top:0;" />
+                    </div>
+                    <details style="margin-top: 15px;">
+                        <summary
+                            style="font-size: 0.75rem; color: var(--text-muted); cursor: pointer; font-weight: 700; opacity: 0.7;">
+                            Usar Início/Fim KM</summary>
+                        <div class="minput-row" style="margin-top: 15px;">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">KM Início</span>
+                            <input type="number" id="m-km-start" placeholder="0"
+                                style="max-width: 120px; margin-top:0;" />
                         </div>
-                        <details style="margin-top: 15px;">
-                            <summary style="font-size: 0.75rem; color: var(--text-muted); cursor: pointer; font-weight: 700; opacity: 0.7;">Usar Início/Fim KM</summary>
-                            <div class="minput-row" style="margin-top: 15px;">
-                                <span style="font-size: 0.85rem; color: var(--text-muted);">KM Início</span>
-                                <input type="number" id="m-km-start" placeholder="0" style="max-width: 120px; margin-top:0;" />
-                            </div>
-                            <div class="minput-row">
-                                <span style="font-size: 0.85rem; color: var(--text-muted);">KM Fim</span>
-                                <input type="number" id="m-km-end" placeholder="0" style="max-width: 120px; margin-top:0;" />
-                            </div>
-                        </details>
+                        <div class="minput-row">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">KM Fim</span>
+                            <input type="number" id="m-km-end" placeholder="0"
+                                style="max-width: 120px; margin-top:0;" />
+                        </div>
+                    </details>
 
                 </div>
 
@@ -1086,13 +1128,16 @@
 
                 </div>
 
-                <div class="minput-row" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 15px;">
+                <div class="minput-row"
+                    style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 15px;">
 
                     <span style="font-weight: 600; color: var(--text-muted);">Modo Visual</span>
 
-                    <div style="display: flex; gap: 8px; background: var(--surface-alt); padding: 4px; border-radius: 12px;">
+                    <div
+                        style="display: flex; gap: 8px; background: var(--surface-alt); padding: 4px; border-radius: 12px;">
 
-                        <button id="btn-theme-dark" class="btn-toggle-small active" onclick="setTheme('dark')">Escuro</button>
+                        <button id="btn-theme-dark" class="btn-toggle-small active"
+                            onclick="setTheme('dark')">Escuro</button>
 
                         <button id="btn-theme-light" class="btn-toggle-small" onclick="setTheme('light')">Claro</button>
 
@@ -1240,9 +1285,8 @@
 
     </div>
 
-    <script src="app.js?v=180"></script>
+    <script src="app.js?v=210"></script>
 
 </body>
 
 </html>
-
