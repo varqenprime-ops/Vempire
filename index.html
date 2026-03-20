@@ -39,7 +39,7 @@
 
     </script>
 
-    <link rel="stylesheet" href="style.css?v=400">
+    <link rel="stylesheet" href="style.css?v=410">
 
 </head>
 
@@ -189,23 +189,17 @@
 
             <div class="app-container">
 
-                <header class="topbar"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 24px;">
+                <header class="topbar">
 
                     <div style="display: flex; align-items: center; gap: 15px;">
 
-                        <div class="mobile-menu-toggle" onclick="toggleSidebar()"
-                            style="margin: 0; padding: 0; font-size: 1.8rem;">☰</div>
+                        <div class="mobile-menu-toggle" onclick="toggleSidebar()">☰</div>
 
-                        <div class="header-title" id="main-view-title" style="margin: 0; font-size: 1.8rem;">Perfil
-                        </div>
+                        <div class="header-title" id="main-view-title">Perfil</div>
 
                     </div>
 
-                    <div onclick="openSettingsModal()"
-                        style="width: 42px; height: 42px; background: var(--accent-pink); border-radius: 12px; display:flex; align-items:center; justify-content:center; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);"
-                        onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">⚙️
-                    </div>
+                    <div onclick="openSettingsModal()" class="btn-settings">⚙️</div>
 
                 </header>
 
@@ -1285,7 +1279,7 @@
 
     </div>
 
-    <script src="app.js?v=400"></script>
+    <script src="app.js?v=410"></script>
 
 </body>
 
