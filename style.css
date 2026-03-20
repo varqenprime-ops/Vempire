@@ -410,19 +410,21 @@ body {
 
 .day-km-tag {
     position: absolute;
-    top: 5px;
-    left: 6px;
-    font-size: 0.65rem;
+    width: 100%;
+    text-align: center;
+    top: 68%;
+    left: 0;
+    font-size: 0.72rem;
     font-weight: 800;
     color: var(--yellow);
     opacity: 0.9;
     z-index: 3;
     pointer-events: none;
+    letter-spacing: -0.2px;
 }
 
 .light-mode .day-km-tag {
-    color: #b45309;
-    /* Um laranja mais escuro para ler melhor no branco */
+    color: #b45309; 
 }
 
 /* Forms and Inputs */
