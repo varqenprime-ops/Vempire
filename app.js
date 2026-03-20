@@ -570,17 +570,23 @@
         
 
         function switchView(v, updateSidebar = true) {
+            console.log('SWITCHVIEW V4.2:', v);
 
-            console.log('SWITCHVIEW V4.1:', v);
+            // Update Topbar Title
+            const topTitleEl = document.getElementById('main-view-title');
+            if (topTitleEl) {
+                const names = {
+                    'profile': 'Perfil',
+                    'calendar': 'Calendário',
+                    'report': 'Relatório'
+                };
+                topTitleEl.innerText = names[v] || 'Vempire';
+            }
 
             const views = ['profile', 'calendar', 'report'];
-
             views.forEach(x => {
-
                 const el = document.getElementById('view-' + x);
-
                 if (el) el.classList.add('hidden');
-
             });
 
             const target = document.getElementById('view-' + v);
