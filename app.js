@@ -604,7 +604,7 @@ import {
         }
 
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             const loading = document.getElementById('loading-screen');
             if (user) {
                 const uid = user.uid;
@@ -613,8 +613,41 @@ import {
                 localStorage.setItem(STORE_KEY_PREFIX + '_last_id', uid);
                 localStorage.setItem(STORE_KEY_PREFIX + '_last_email', email);
                 
-                loadUserDB(uid);
+                // Firestore Cloud Sync
+                try {
+                    const docSnap = await getDoc(doc(db, "users", uid));
+                    if (docSnap.exists()) {
+                        DB = docSnap.data();
+                        
+                        // Garante que os markers default existem
+                        if (!DB.config.markers) {
+                            DB.config.markers = JSON.parse(JSON.stringify(MARKERS));
+                        }
+                        localStorage.setItem(STORE_KEY, JSON.stringify(DB));
+                    } else {
+                        // Se não existe na nuvem, init local e sobe
+                        loadUserDB(uid);
+                        
+                        // Tentar recuperar o nome preenchido no registo
+                        const fallbackName = localStorage.getItem(STORE_KEY_PREFIX + '_name_' + uid);
+                        if (fallbackName && (!DB.config.nome || DB.config.nome.trim() === '')) {
+                            DB.config.nome = fallbackName;
+                        }
+                        
+                        await setDoc(doc(db, "users", uid), DB);
+                        localStorage.removeItem(STORE_KEY_PREFIX + '_name_' + uid); // limpar
+                    }
+                } catch (e) {
+                    console.error("Erro ao sincronizar com Firestore:", e);
+                    loadUserDB(uid);
+                }
+
                 DB.auth = true;
+
+                // Sync de UI Settings imediatamente
+                const n2 = document.getElementById('cfg-nome-2');
+                if (n2 && DB.config.nome) n2.value = DB.config.nome;
+                
                 const emailLblH = document.getElementById('lbl-user-email');
                 const emailLblS = document.getElementById('lbl-user-email-sidebar');
                 if (emailLblH) emailLblH.innerText = email || 'Anónimo';
