@@ -8,7 +8,9 @@
             signInWithEmailAndPassword,
             createUserWithEmailAndPassword,
             sendPasswordResetEmail,
-            signOut
+            signOut,
+            setPersistence,
+            browserLocalPersistence
         } from 'firebase/auth';
 
         // TODO: SUBSTITUIR PELO TEU CONFIG DA CONSOLA FIREBASE
@@ -23,6 +25,9 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        
+        // Ativar Persistência Local (Sessão não expira ao fechar browser)
+        setPersistence(auth, browserLocalPersistence).catch(console.error);
 
         const STORE_KEY_PREFIX = 'journey-tracker-pro-v2';
 
@@ -601,6 +606,7 @@
 
 
         onAuthStateChanged(auth, (user) => {
+            const loading = document.getElementById('loading-screen');
             if (user) {
                 const uid = user.uid;
                 const email = user.email;
@@ -608,38 +614,28 @@
                 localStorage.setItem(STORE_KEY_PREFIX + '_last_id', uid);
                 localStorage.setItem(STORE_KEY_PREFIX + '_last_email', email);
                 
-                // MIGRATION: Se houver dados no email antigo mas não no UID, movemos
-                if (email) {
-                    const emailKey = getStoreKey(email);
-                    const oldData = localStorage.getItem(emailKey);
-                    if (oldData && !localStorage.getItem(STORE_KEY)) {
-                        localStorage.setItem(STORE_KEY, oldData);
-                        console.log('Migração de dados (Email -> UID) concluída.');
-                    }
-                }
-
                 loadUserDB(uid);
                 DB.auth = true;
                 const emailLblH = document.getElementById('lbl-user-email');
                 const emailLblS = document.getElementById('lbl-user-email-sidebar');
-                if (emailLblH) emailLblH.innerText = email || 'An\u00F3nimo';
-                if (emailLblS) emailLblS.innerText = email || 'An\u00F3nimo';
+                if (emailLblH) emailLblH.innerText = email || 'Anónimo';
+                if (emailLblS) emailLblS.innerText = email || 'Anónimo';
 
-                // Sync Sidebar Photo
                 const sidePhoto = document.getElementById('sidebar-photo');
                 if (sidePhoto && DB.config.photo) {
                     sidePhoto.innerHTML = `<img src="${DB.config.photo}" />`;
                 }
 
-                // ADMIN CHECK
                 const isAdmin = email === 'admin@vwheel.pt';
                 const mgmtNav = document.getElementById('side-nav-mgmt');
                 if (mgmtNav) mgmtNav.classList.toggle('hidden', !isAdmin);
 
                 showApp();
+                if (loading) loading.classList.add('hidden');
             } else {
                 document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('hidden');
+                if (loading) loading.classList.add('hidden');
             }
         });
 
@@ -2752,17 +2748,7 @@
             window.location.href = `mailto:?subject=${subject}&body=${text}`;
         };
 
-        // ── AUTO-RESTAURAR SESSÃO ──
-        (function() {
-            const lastId = localStorage.getItem(STORE_KEY_PREFIX + '_last_id');
-            const lastEmail = localStorage.getItem(STORE_KEY_PREFIX + '_last_email');
-            if (lastId) {
-                const emailInput = document.getElementById('l-email');
-                if (emailInput && lastEmail) emailInput.value = lastEmail;
-                loadUserDB(lastId);
-                if (DB.auth) { showApp(); return; }
-            }
-        })();
+
 
 
         window.addEventListener('click', (e) => {
