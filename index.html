@@ -15,124 +15,138 @@
 
     <meta name="theme-color" content="#f2f4f1" />
 
-    <title>Vempire</title>
+    <title>Vwheel</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
 
-    <!-- Scripts for PDF and Charts -->
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script>
-
-        window.addEventListener('error', function (e) {
-
-            fetch('/js-error?msg=' + encodeURIComponent(e.message) + '&line=' + e.lineno);
-
-            document.body.innerHTML = '<div style="color:red; background:white; padding:20px; font-size:20px; position:absolute; z-index:9999; top:0; left:0; width:100%; height:100%;"><h1>JS ERROR:</h1><p>' + e.error.stack + '</p></div>' + document.body.innerHTML;
-
-        });
-
+    <!-- Firebase SDK (Modular v10) -->
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+      }
+    }
     </script>
 
-    <link rel="stylesheet" href="style.css?v=430">
+    <!-- 
+    <script>
+        window.addEventListener('error', function (e) {
+            document.body.innerHTML = '<div style="color:red; background:white; padding:20px; position:absolute; top:0; left:0; z-index:99999; border:5px solid red;"><h1>JS ERROR:</h1><p>' + e.error.stack + '</p></div>' + document.body.innerHTML;
+        });
+    </script> 
+    -->
+
+    <link rel="stylesheet" href="style.css?v=700">
 
 </head>
 
 <body>
 
-    <!-- LOGIN SCREEN -->
-
     <div id="login-screen">
-
         <div class="login-content">
-
-            <div class="branding">Journey<br /><span>TRACKER PRO</span></div>
-
-            <div class="login-sub">O teu diário de motorista profissional</div>
-
+            <div class="branding">Vwheel<br /><span>PRO</span></div>
+            <div class="login-sub" id="login-mode-title">Entrar na tua conta</div>
+            
             <div class="login-box">
+                <!-- Foto Registro (Solo visible en registro) -->
+                <div id="signup-photo-container" class="hidden" style="margin-bottom:20px; display:flex; justify-content:center;">
+                    <div id="signup-photo-circle" onclick="document.getElementById('file-avatar').click()" 
+                         style="width:80px; height:80px; border-radius:50%; background:var(--surface-alt); border:2px dashed var(--accent); display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden;">
+                        <span style="font-size:1.5rem;">📷</span>
+                    </div>
+                </div>
 
-                <input type="text" id="l-email" placeholder="O teu nome ou email" autocomplete="username" />
+                <div id="signup-name-container" class="hidden" style="margin-bottom:12px;">
+                    <input type="text" id="l-name" placeholder="O teu Nome" autocomplete="name" />
+                </div>
+                
+                <input type="email" id="l-email" placeholder="O teu email" autocomplete="email" />
+                
+                <div style="position:relative; width:100%; margin-top:12px;">
+                    <input type="password" id="l-password" placeholder="Senha" autocomplete="current-password" style="width:100% !important; padding-right:50px !important;" />
+                    <span class="toggle-password-eye-common" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer; opacity:0.6; font-size:1.2rem; user-select:none; z-index:10;">👁️</span>
+                </div>
 
-                <input type="password" id="l-password" placeholder="Senha (mínimo 4 caract.)"
-                    autocomplete="current-password" />
-
+                <div id="signup-confirm-container" class="hidden" style="position:relative; width:100%; margin-top:12px;">
+                    <input type="password" id="l-password-confirm" placeholder="Confirmar Senha" autocomplete="new-password" style="width:100% !important; padding-right:50px !important;" />
+                    <span class="toggle-password-eye-common" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer; opacity:0.6; font-size:1.2rem; user-select:none; z-index:10;">👁️</span>
+                </div>
             </div>
 
-            <button class="btn-go" id="btn-login">Entrar</button>
+            <button class="btn-go" id="btn-login-email" style="margin-top: 25px;">Entrar</button>
+            <button class="btn-go hidden" id="btn-signup-email" style="margin-top: 25px;">Criar Minha Conta</button>
+            
+            <div style="margin-top:20px; text-align:center;">
+                <p style="font-size:0.8rem; color:var(--text-muted); cursor:pointer;" id="toggle-auth-mode">Não tens conta? <span style="color:var(--accent); font-weight:800;">Regista-te aqui</span></p>
+                <p style="font-size:0.8rem; color:var(--text-muted); cursor:pointer; margin-top:10px;" id="btn-forgot-password">Esqueceste-te da senha?</p>
+            </div>
 
+            <div style="margin:25px 0; display:flex; align-items:center; gap:10px; opacity:0.3;">
+                <hr style="flex:1; border:none; border-top:1px solid #fff;">
+                <span style="font-size:0.7rem;">OU</span>
+                <hr style="flex:1; border:none; border-top:1px solid #fff;">
+            </div>
+
+            <button class="btn-google" id="btn-login-google">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                Entrar com o Google
+            </button>
+
+            <p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 20px; text-align: center;">
+                Ao entrar, aceitas os nossos <span style="text-decoration: underline; cursor: pointer;">Termos</span> e <span style="text-decoration: underline; cursor: pointer;">Política de Privacidade</span>.
+            </p>
         </div>
-
-    </div>
-
-    <!-- ONBOARDING -->
-
-    <div id="onboarding-overlay" class="hidden"
-        style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,14,20,0.9);z-index:10000;display:flex;justify-content:center;align-items:center;padding:24px;backdrop-filter:blur(20px);">
-
+    </div>    <div id="onboarding-overlay" class="hidden"
+        style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(11,14,20,0.95);z-index:10000;display:flex;justify-content:center;align-items:center;padding:24px;backdrop-filter:blur(20px); overflow-y:auto;">
         <div class="card"
-            style="width:100%;max-width:440px;background:rgba(255,255,255,0.03);padding:40px;border-radius:40px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);margin:0;">
+            style="width:100%;max-width:440px;background:rgba(255,255,255,0.03);padding:40px;border-radius:40px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);margin:auto;">
+            <h2 style="margin-bottom:16px;color:white;font-weight:800;font-size:1.8rem;letter-spacing:-1px;">Bem-vindo! 🚀</h2>
+            <p style="font-size:0.95rem;color:var(--text-muted);margin-bottom:32px;line-height:1.5;">Configura o teu perfil para começar.</p>
 
-            <h2 style="margin-bottom:16px;color:white;font-weight:800;font-size:1.8rem;letter-spacing:-1px;">Bem-vindo!
-                🚀</h2>
+            <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:30px;">
+                <div id="onb-photo-circle" onclick="document.getElementById('file-avatar').click()" 
+                     style="width:100px; height:100px; border-radius:50%; background:var(--surface-alt); border:2px dashed var(--accent); display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden;">
+                    <span style="font-size:2rem;">📷</span>
+                </div>
+                <span style="font-size:0.7rem; color:var(--accent); font-weight:800; margin-top:8px;">ADICIONAR FOTO</span>
+            </div>
 
-            <p style="font-size:0.95rem;color:var(--text-muted);margin-bottom:32px;line-height:1.5;">Configura o teu
-                perfil para começar.</p>
-
-            <div class="setting-row" style="margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.05);">
-
+            <div class="setting-row">
                 <span class="setting-label">Nome Motorista</span>
-
-                <input type="text" id="onb-nome" class="setting-input" placeholder="O teu nome"
-                    style="text-align:right;width:180px;" />
-
+                <input type="text" id="onb-nome" class="setting-input" placeholder="O teu nome" style="text-align:right;width:180px;" />
             </div>
-
-            <div class="setting-row" style="margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.05);">
-
+            <div class="setting-row">
                 <span class="setting-label">Matrícula</span>
-
-                <input type="text" id="onb-matricula" class="setting-input" placeholder="AA-00-BB"
-                    style="text-align:right;width:180px;" />
-
+                <input type="text" id="onb-matricula" class="setting-input" placeholder="AA-00-BB" style="text-align:right;width:180px;" />
             </div>
-
-            <div class="setting-row" style="margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.05);">
-
+            <div class="setting-row">
                 <span class="setting-label">Estado Civil</span>
-
                 <select id="onb-civil" class="setting-input" style="width:auto;">
-
                     <option value="solteiro">Solteiro</option>
-
                     <option value="casado">Casado</option>
-
                 </select>
-
             </div>
-
-            <div class="setting-row" style="margin-bottom:24px;border-bottom:none;">
-
+            <div id="onb-spouse-block" class="setting-row hidden">
+                <span class="setting-label">Cônjuge trabalha?</span>
+                <label class="toggle-container">
+                    <input type="checkbox" id="onb-spouse-work" class="toggle-input" checked>
+                    <div class="toggle-slider"></div>
+                </label>
+            </div>
+            <div class="setting-row">
                 <span class="setting-label">Filhos Dependentes</span>
-
-                <input type="number" id="onb-filhos" class="setting-input" value="0" min="0"
-                    style="text-align:right;width:80px;" />
-
+                <input type="number" id="onb-filhos" class="setting-input" value="0" min="0" style="text-align:right;width:80px;" />
             </div>
 
-            <div id="onb-error"
-                style="color:#ff5555;font-size:0.85rem;font-weight:700;margin-bottom:20px;text-align:center;display:none;">
-                ⚠️ Preenche o Nome e a Matrícula.</div>
-
-            <button id="btn-save-onboarding" class="btn-go" style="margin-top:0;">Concluir Configuração</button>
-
+            <div id="onb-error" style="color:#ff5555;font-size:0.85rem;font-weight:700;margin:20px 0;text-align:center;display:none;">⚠️ Preenche o Nome e a Matrícula.</div>
+            <button id="btn-save-onboarding" class="btn-go" style="margin-top:20px;">Concluir Configuração</button>
         </div>
-
     </div>
 
     <div id="app-screen" class="hidden">
@@ -145,7 +159,7 @@
 
             <div class="sidebar-brand">
 
-                🚀 <span>Journey</span>
+                🚀 <span>Vwheel</span>
 
             </div>
 
@@ -164,21 +178,33 @@
                 </div>
 
                 <div id="side-nav-report" class="nav-item-new" onclick="switchView('report', true)">
-
                     <span>📊</span> Relatório
-
+                </div>
+                <!-- Admin Only -->
+                <div id="side-nav-mgmt" class="nav-item-new hidden" onclick="switchView('management', true)" style="border:1px solid var(--accent); margin-top:20px; color:var(--accent);">
+                    <span>💼</span> Gestão BI
                 </div>
 
             </nav>
 
             <div style="margin-top: auto; padding: 20px 0; border-top: 1px solid var(--border);">
-
-                <div class="nav-item-new" style="color: var(--red);" onclick="doLogout()">
-
-                    <span>🚪</span> Sair
-
+                <div style="padding: 0 20px 15px;">
+                    <p style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 8px;">Sessão Ativa</p>
+                    <div style="display: flex; align-items: center;">
+                        <div id="sidebar-photo" class="sidebar-avatar">
+                            <span>👤</span>
+                        </div>
+                        <p id="lbl-user-email-sidebar" style="font-size: 0.8rem; font-weight: 700; color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">...</p>
+                    </div>
                 </div>
 
+                <div class="nav-item-new" onclick="openSettingsModal()" style="font-size: 0.85rem; padding: 10px 20px;">
+                    <span>⚙️</span> Definições
+                </div>
+
+                <div class="nav-item-new" onclick="doLogout()" style="color: var(--red); font-size: 0.85rem; padding: 10px 20px;">
+                    <span>🚪</span> Terminar Sessão
+                </div>
             </div>
 
         </aside>
@@ -198,8 +224,6 @@
                         <div class="header-title" id="main-view-title">Perfil</div>
 
                     </div>
-
-                    <div onclick="openSettingsModal()" class="btn-settings">⚙️</div>
 
                 </header>
 
@@ -280,26 +304,9 @@
 
                 <div id="view-profile">
 
-                    <div class="section-title">Dados de Frota e Pessoa</div>
-
-                    <div class="card">
-
-                        <div class="setting-row">
-
-                            <span class="setting-label">Nome Motorista</span>
-
-                            <input type="text" id="cfg-nome" class="setting-input" placeholder="O Teu Nome" />
-
-                        </div>
-
-                        <div class="setting-row">
-
-                            <span class="setting-label">Matrícula</span>
-
-                            <input type="text" id="cfg-matricula" class="setting-input" placeholder="AA-00-BB" />
-
-                        </div>
-
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px;">
+                        <div class="section-title" style="margin-bottom:0;">Dados da Minha Conta</div>
+                        <div class="btn-profile-settings" onclick="openSettingsModal()">⚙️</div>
                     </div>
 
                     <div class="section-title">Configuração CCT 2026 (Motor)</div>
@@ -496,10 +503,13 @@
                         <!-- INPUT DO SALÁRIO BASE -->
 
                         <div class="setting-row">
+                            <span class="setting-label">Valor Hora (€)</span>
+                            <input type="number" id="cfg-valor-hora" class="setting-input" value="0" step="0.01" />
+                        </div>
+                        <div class="setting-row">
                             <div class="setting-label">
                                 Vencimento Base (€)
-                                <small id="rs-base" class="hidden" onclick="resetToLaw('base')">Repor Lei
-                                    (1.014,02€)</small>
+                                <small id="rs-base" class="hidden" onclick="resetToLaw('base')">Repor Lei (1.014,02€)</small>
                             </div>
                             <input type="number" id="cfg-base" class="setting-input" value="1014.02" step="0.01" />
                         </div>
@@ -755,23 +765,14 @@
                                     <th style="width: 25%;">Cor</th>
 
                                     <th style="width: 25%;">Valor (€)</th>
-
                                     <th style="width: 10%;"></th>
-
                                 </tr>
-
                             </thead>
-
                             <tbody id="body-markers"></tbody>
-
                         </table>
-
                         <button class="btn-add-row" onclick="addCustomMarker()">+ Novo Marcador</button>
-
                     </div>
-
                 </div>
-
                 <!-- REPORT VIEW -->
 
                 <div id="view-report" class="hidden">
@@ -849,6 +850,12 @@
                                 <span id="rpt-extras"
                                     style="font-weight:800; font-size: 1.2rem; color: var(--accent-pink);">€ 0.00</span>
 
+                            </div>
+
+                            <div class="setting-row">
+                                <span class="setting-label">Ganhos Horas</span>
+                                <span id="rpt-horas-val"
+                                    style="font-weight:800; font-size: 1.2rem; color: #facc15;">€ 0.00</span>
                             </div>
 
                             <div class="setting-row">
@@ -1027,6 +1034,20 @@
 
                 </div>
 
+                <div id="m-horas-block" style="margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border);">
+                    <div class="minput-row">
+                        <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">Horas Extra / Espaciais</span>
+                        <input type="number" id="m-horas-extra" placeholder="0" step="0.5" style="max-width: 100px; margin-top:0;" />
+                    </div>
+                </div>
+
+                <div id="m-horas-block" style="margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--border);">
+                    <div class="minput-row">
+                        <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">Horas</span>
+                        <input type="number" id="m-horas-extra-input" placeholder="0" step="0.5" style="max-width: 100px; margin-top:0;" />
+                    </div>
+                </div>
+
                 <div id="m-km-block" style="margin-top: 25px;">
                     <div class="minput-row">
                         <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">KM
@@ -1083,63 +1104,114 @@
     <!-- Settings Modal (Civil Status / Children) -->
 
     <div id="modal-settings" class="modal-overlay hidden">
-
         <div class="modal">
+            <h2 style="margin-bottom: 24px; letter-spacing: -1px;">Definições de Conta</h2>
 
-            <h3 style="margin-bottom: 20px;">Definições de Perfil</h3>
-
-            <div class="modal-inputs" style="display: flex; flex-direction: column; gap: 15px;">
-
-                <div class="minput-row" style="display: flex; justify-content: space-between; align-items: center;">
-
-                    <span style="font-weight: 600; color: var(--text-muted);">Estado Civil</span>
-
-                    <select id="cfg-civil" class="setting-input" style="width: 150px;">
-
-                        <option value="solteiro">Solteiro</option>
-
-                        <option value="casado">Casado</option>
-
-                    </select>
-
-                </div>
-
-                <div class="minput-row" style="display: flex; justify-content: space-between; align-items: center;">
-
-                    <span style="font-weight: 600; color: var(--text-muted);">Filhos Dependentes</span>
-
-                    <input type="number" id="cfg-filhos" class="setting-input" style="width: 80px;" value="0" min="0" />
-
-                </div>
-
-                <div class="minput-row"
-                    style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 15px;">
-
-                    <span style="font-weight: 600; color: var(--text-muted);">Modo Visual</span>
-
-                    <div
-                        style="display: flex; gap: 8px; background: var(--surface-alt); padding: 4px; border-radius: 12px;">
-
-                        <button id="btn-theme-dark" class="btn-toggle-small active"
-                            onclick="setTheme('dark')">Escuro</button>
-
-                        <button id="btn-theme-light" class="btn-toggle-small" onclick="setTheme('light')">Claro</button>
-
+            <!-- PHOTO & IDENTITY -->
+            <p class="section-subtitle">IDENTIDADE</p>
+            <div class="card" style="margin: 0 0 20px; padding: 20px;">
+                <div style="display:flex; align-items:center; gap:20px; margin-bottom:15px;">
+                    <div id="cfg-photo-circle" onclick="document.getElementById('file-avatar').click()"
+                         style="width:70px; height:70px; border-radius:50%; background:var(--surface-alt); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden;">
+                        <span style="font-size:1.5rem;">📷</span>
                     </div>
-
+                    <div style="flex:1;">
+                        <input type="text" id="cfg-nome-2" class="setting-input" style="text-align:left; width:100%; margin-bottom:8px;" placeholder="Nome Completo" />
+                        <input type="text" id="cfg-matricula-2" class="setting-input" style="text-align:left; width:100%; margin-bottom:12px;" placeholder="Matrícula" />
+                        <button class="btn-toggle-small" id="btn-change-pass-modal" style="width:100%; background:var(--surface-alt); border:1px solid var(--border); font-size:0.75rem; padding:8px;">🔑 Alterar Senha da Conta</button>
+                    </div>
                 </div>
+            </div>
 
+            <!-- FISCAL -->
+            <p class="section-subtitle">FISCAL & FAMÍLIA</p>
+            <div class="card" style="margin: 0 0 20px; padding: 10px 20px;">
+                <div class="setting-row">
+                    <span class="setting-label">Estado Civil</span>
+                    <select id="cfg-civil" class="setting-input" style="width: auto;">
+                        <option value="solteiro">Solteiro</option>
+                        <option value="casado">Casado</option>
+                    </select>
+                </div>
+                <div id="cfg-spouse-block" class="setting-row hidden">
+                    <span class="setting-label">Cônjuge trabalha?</span>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="cfg-spouse-work" class="toggle-input">
+                        <div class="toggle-slider"></div>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Filhos Dependentes</span>
+                    <input type="number" id="cfg-filhos" class="setting-input" style="width: 70px;" value="0" min="0" />
+                </div>
+            </div>
+
+            <!-- REGISTO & PRIVACIDADE -->
+            <p class="section-subtitle">SEGURANÇA & RGPD</p>
+            <div class="card" style="margin: 0 0 20px; padding: 15px 20px;">
+                <div class="setting-row" onclick="window.openModal('modal-policy-privacy')" style="cursor:pointer;">
+                    <span class="setting-label">Termos & RGPD</span>
+                    <span>📄</span>
+                </div>
+                <div class="setting-row" onclick="window.openModal('modal-policy-data')" style="cursor:pointer;">
+                    <span class="setting-label">Gestão de Dados (Segurança)</span>
+                    <span>🛡️</span>
+                </div>
+            </div>
+
+            <!-- THEME & LOGOUT -->
+            <div class="card" style="margin: 0 0 20px; padding: 15px 20px;">
+                <div class="setting-row">
+                    <span class="setting-label">Modo Visual</span>
+                    <div style="display: flex; gap: 8px; background: var(--surface-alt); padding: 4px; border-radius: 12px;">
+                        <button id="btn-theme-dark" class="btn-toggle-small" onclick="setTheme('dark')">🌙</button>
+                        <button id="btn-theme-light" class="btn-toggle-small" onclick="setTheme('light')">☀️</button>
+                    </div>
+                </div>
+                <div class="setting-row" style="border-top:1px solid var(--border); margin-top:15px; padding-top:15px;">
+                    <button class="btn-toggle-small" onclick="doLogout()" style="width:100%; background:var(--surface-alt); color:white; border:1px solid var(--border);">Sair da Sessão</button>
+                </div>
+            </div>
+
+            <!-- DANGER ZONE -->
+            <p class="section-subtitle" style="color:var(--red);">ZONA DE PERIGO</p>
+            <div class="card" style="margin: 0 0 20px; padding: 15px 20px; border: 1px solid rgba(255, 85, 85, 0.2);">
+                <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 12px; line-height:1.4;">
+                    Ao apagar a conta, todos os seus dados de calendário e perfil serão eliminados permanentemente dos nossos servidores.
+                </p>
+                <button class="btn-toggle-small" id="btn-delete-account-2" style="width:100%; background:var(--red); color:white; border:none; padding:12px; font-weight:800; border-radius:12px;">Eliminar Conta Permanentemente</button>
             </div>
 
             <div class="modal-actions">
-
-                <button class="btn-save" onclick="closeSettingsModal()">Fechar e Guardar</button>
-
+                <button class="btn-save" style="width:100%;" onclick="closeSettingsModal()">Guardar Alterações</button>
             </div>
-
         </div>
-
     </div>
+
+    <!-- Modais de Políticas -->
+    <div id="modal-policy-privacy" class="modal-overlay hidden">
+        <div class="modal">
+            <h2>Política de Privacidade</h2>
+            <div style="margin:20px 0; color:var(--text-muted); font-size:0.9rem; line-height:1.6;">
+                <p>O Vempire respeita a tua privacidade. Todos os dados introduzidos no calendário e perfil são processados localmente ou de forma segura via Google Firebase.</p>
+                <p>Não partilhamos dados pessoais com terceiros. Os dados apenas são utilizados para fins de cálculo e visualização do próprio utilizador.</p>
+            </div>
+            <button class="btn-go" onclick="this.closest('.modal-overlay').classList.add('hidden')">Fechar</button>
+        </div>
+    </div>
+
+    <div id="modal-policy-data" class="modal-overlay hidden">
+        <div class="modal">
+            <h2>Gestão de Dados</h2>
+            <div style="margin:20px 0; color:var(--text-muted); font-size:0.9rem; line-height:1.6;">
+                <p>Tens o direito de aceder, retificar e eliminar os teus dados a qualquer momento.</p>
+                <p>Ao clicares em "Eliminar Conta" nas definições, apagaremos todos os teus registos de forma irreversível de acordo com o RGPD.</p>
+            </div>
+            <button class="btn-go" onclick="this.closest('.modal-overlay').classList.add('hidden')">Fechar</button>
+        </div>
+    </div>
+
+    <input type="file" id="file-avatar" class="hidden" accept="image/*" />
 
     <!-- HIDDEN PDF CONTAINER -->
 
@@ -1269,7 +1341,7 @@
 
     </div>
 
-    <script src="app.js?v=430"></script>
+    <script type="module" src="app.js?v=700"></script>
 
 </body>
 

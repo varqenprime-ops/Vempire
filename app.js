@@ -1,8 +1,35 @@
 
+        import { initializeApp } from 'firebase/app';
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signInWithPopup, 
+            GoogleAuthProvider,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            sendPasswordResetEmail,
+            signOut
+        } from 'firebase/auth';
 
-        // ── MULTI-PERFIL: chave dinâmica por email ──
+        // TODO: SUBSTITUIR PELO TEU CONFIG DA CONSOLA FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSy...",
+            authDomain: "vempire-e74c8.firebaseapp.com",
+            projectId: "vempire-e74c8",
+            storageBucket: "vempire-e74c8.appspot.com",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
         const STORE_KEY_PREFIX = 'journey-tracker-pro-v2';
+
+        window.openModal = (id) => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden');
+        };
 
         let STORE_KEY = STORE_KEY_PREFIX;
 
@@ -110,14 +137,13 @@
                 emojiIcons: ['🚀', '☕', '🛌', '🔧', '💰', '❌'],
 
                 kmEscaloes: [
-
                     { id: 1, ate: 1500, valor: 0.10 },
                     { id: 2, ate: 99999, valor: 0.20 }
                 ],
+                valorHora: 0,
                 markers: JSON.parse(JSON.stringify(MARKERS))
             },
             events: {}
-
         };
 
         // Persist\u00EAncia de Dados
@@ -175,6 +201,7 @@
             if (DB.config.base === undefined) DB.config.base = TABELAS.nacional.base;
 
             if (DB.config.kmEnabled === undefined) DB.config.kmEnabled = true;
+            if (DB.config.valorHora === undefined) DB.config.valorHora = 0;
 
             if (!DB.config.kmEscaloes) DB.config.kmEscaloes = [
 
@@ -275,14 +302,10 @@
 
             const bruto = base + diuturnidades + c61 + compPerc + c75 + noturno + cisterna + adr + operacoes;
 
-            // ── Passo 3 & 4: Duod\u00E9cimos (Gaveta 2) ou Subs\u00EDdios Integrais ──
-
-            // Natal mant\u00E9m a f\u00F3rmula original (Base + Diuturnidades + Complemento)
-
-            // F\u00E9rias inclui todas as cl\u00E1usulas: Base + Diuturnidades + Complemento + Noturno (10%) + C61 (50%) + C75
-
+            // ── Passo 3 & 4: Subsídios e Duodécimos ──
+            // Natal: Base + Diuturnidades + Complemento (conforme CCT)
+            // Férias: Natal + Noturno (Fixo) + C61 (50%) + C75 (TIR)
             const natalVal = (base + diuturnidades + compPerc);
-
             const feriasVal = natalVal + L_NOTURNO_FIXO + c61 + c75;
 
             let duoNatal = 0;
@@ -298,7 +321,6 @@
             } else {
 
                 const currentMonth = workingDate.getMonth();
-
                 const subNatalM = DB.config.subNatalMonth ?? 11;
 
                 const subFeriasM = DB.config.subFeriasMonth ?? 6;
@@ -325,9 +347,15 @@
 
             const filhos = DB.config.filhos || 0;
 
-            irsRate = Math.max(0, irsRate - (filhos * 0.01));
+            irsRate = Math.max(0, irsRate - (filhos * 0.015));
 
-            if (DB.config.civil === 'casado') irsRate = Math.max(0, irsRate - 0.005);
+            if (DB.config.civil === 'casado') {
+                if (!DB.config.spouseWork) {
+                    irsRate = Math.max(0, irsRate - 0.02); 
+                } else {
+                    irsRate = Math.max(0, irsRate - 0.005);
+                }
+            }
 
             const irsSalario = bruto * irsRate;
 
@@ -383,49 +411,13 @@
 
         function getIRS(d) { const s = calcSalary(d); return s.irsTotal; }
 
-        function getSS(d) { return calcSalary(d).ssTotal; }
+        function getSS(d) { const s = calcSalary(d); return s.ssTotal; }
 
         function getFixoLiquido(d) { const s = calcSalary(d); return { salLiquido: s.liquido, duoLiquido: s.liquidoDuo, total: s.liquidoTotal }; }
 
         // ── LAW RESETS
 
-        function resetToLaw(key) {
-
-            if (key === 'base') {
-
-                DB.config.base = L_BASE;
-
-                const el = document.getElementById('cfg-base');
-
-                if (el) el.value = L_BASE;
-
-            } else if (key === 'diuValor') {
-
-                DB.config.diuValor = L_DIUTURNIDADE;
-
-                const el = document.getElementById('cfg-diuValor');
-
-                if (el) el.value = L_DIUTURNIDADE;
-
-            }
-
-            DB_SAVE();
-
-            updateFixoUI();
-
-        }
-
-        function updateLawWarnings() {
-
-            const rsBase = document.getElementById('rs-base');
-
-            if (rsBase) rsBase.classList.toggle('hidden', Math.abs((DB.config.base || L_BASE) - L_BASE) < 0.01);
-
-            const rsDiu = document.getElementById('rs-diu-valor');
-
-            if (rsDiu) rsDiu.classList.toggle('hidden', Math.abs((DB.config.diuValor || L_DIUTURNIDADE) - L_DIUTURNIDADE) < 0.01);
-
-        }
+        // --- PROFILE STATUS ---
 
         // ── AUTH ──
 
@@ -457,35 +449,208 @@
 
         }
 
-        function doLogout() {
+        // ── AUTH FIREBASE ──
+        let currentAuthMode = 'login';
 
-            DB.auth = false;
+        const toggleAuthMode = () => {
+            currentAuthMode = (currentAuthMode === 'login' ? 'signup' : 'login');
+            const title = document.getElementById('login-mode-title');
+            const btnLogin = document.getElementById('btn-login-email');
+            const btnSignup = document.getElementById('btn-signup-email');
+            const toggleText = document.getElementById('toggle-auth-mode');
+            
+            const nameC = document.getElementById('signup-name-container');
+            const photoC = document.getElementById('signup-photo-container');
+            const confirmC = document.getElementById('signup-confirm-container');
 
-            DB_SAVE();
+            if (currentAuthMode === 'login') {
+                title.innerText = 'Entrar na tua conta';
+                btnLogin.classList.remove('hidden');
+                btnSignup.classList.add('hidden');
+                if (nameC) nameC.classList.add('hidden');
+                if (photoC) photoC.classList.add('hidden');
+                if (confirmC) confirmC.classList.add('hidden');
+                toggleText.innerHTML = 'Não tens conta? <span style="color:var(--accent); font-weight:800;">Regista-te aqui</span>';
+            } else {
+                title.innerText = 'Criar nova conta';
+                btnLogin.classList.add('hidden');
+                btnSignup.classList.remove('hidden');
+                if (nameC) nameC.classList.remove('hidden');
+                if (photoC) photoC.classList.remove('hidden');
+                if (confirmC) confirmC.classList.remove('hidden');
+                toggleText.innerHTML = 'Já tens conta? <span style="color:var(--accent); font-weight:800;">Faz login aqui</span>';
+            }
+        };
+        window.toggleAuthMode = toggleAuthMode;
+        document.getElementById('toggle-auth-mode').onclick = toggleAuthMode;
 
-            location.reload();
+        const handleAuthAction = async (type) => {
+            const email = document.getElementById('l-email').value.trim();
+            const pass = document.getElementById('l-password').value;
+            const name = document.getElementById('l-name')?.value.trim();
+            const passConf = document.getElementById('l-password-confirm')?.value;
 
+            // BYPASS PARA TESTE (ADMIN)
+            if (email.toLowerCase() === 'admin@vwheel.pt' && pass.trim() === 'Naoqueresnadataloi.22') {
+                const adminUid = 'admin_master_vwheel';
+                STORE_KEY = getStoreKey(adminUid);
+                localStorage.setItem(STORE_KEY_PREFIX + '_last_id', adminUid);
+                localStorage.setItem(STORE_KEY_PREFIX + '_last_email', email); 
+                loadUserDB(adminUid);
+                DB.auth = true;
+                const emailLbl = document.getElementById('lbl-user-email') || document.getElementById('lbl-user-email-sidebar');
+                if (emailLbl) emailLbl.innerText = email;
+                const sidePhoto = document.getElementById('sidebar-photo');
+                if (sidePhoto && DB.config.photo) sidePhoto.innerHTML = `<img src="${DB.config.photo}" />`;
+                const mgmtNav = document.getElementById('side-nav-mgmt');
+                if (mgmtNav) mgmtNav.classList.remove('hidden');
+                showApp();
+                return;
+            }
+
+            if (!email || (type !== 'google' && pass.length < 6)) {
+                return alert('Por favor, introduz um email válido e uma senha com pelo menos 6 caracteres.');
+            }
+
+            if (currentAuthMode === 'signup' && type === 'signup') {
+                if (!name) return alert('Por favor, introduz o teu nome.');
+                if (pass !== passConf) return alert('As senhas não coincidem!');
+            }
+
+            try {
+                let userCredential;
+                if (type === 'login') {
+                    userCredential = await signInWithEmailAndPassword(auth, email, pass);
+                } else if (type === 'signup') {
+                    userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                } else if (type === 'google') {
+                    userCredential = await signInWithPopup(auth, new GoogleAuthProvider());
+                }
+
+                if (currentAuthMode === 'signup' && name && userCredential) {
+                    setTimeout(() => {
+                        DB.config.nome = name;
+                        DB_SAVE();
+                        refreshHeader();
+                    }, 1000);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro na autenticação: ' + err.message);
+            }
+        };
+
+        document.getElementById('btn-login-email').onclick = () => handleAuthAction('login');
+        document.getElementById('btn-signup-email').onclick = () => handleAuthAction('signup');
+        document.getElementById('btn-login-google').onclick = () => handleAuthAction('google');
+
+        document.querySelectorAll('.toggle-password-eye-common').forEach(el => {
+            el.onclick = (e) => {
+                const row = e.target.closest('div');
+                const inp = row.querySelector('input');
+                if (inp.type === 'password') {
+                    inp.type = 'text';
+                    e.target.innerText = '🙈';
+                } else {
+                    inp.type = 'password';
+                    e.target.innerText = '👁️';
+                }
+            };
+        });
+
+        document.getElementById('btn-forgot-password').onclick = async () => {
+            const email = document.getElementById('l-email').value.trim();
+            if (!email) return alert('Introduz o teu email primeiro.');
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Email de recuperação enviado! Verifica a tua caixa de entrada.');
+            } catch (err) { alert('Erro: ' + err.message); }
+        };
+
+        const btnChangePass = document.getElementById('btn-change-pass-modal') || document.getElementById('btn-change-pass-sidebar') || document.getElementById('btn-change-pass-profile');
+        if (btnChangePass) {
+            btnChangePass.onclick = async () => {
+                const user = auth.currentUser;
+                if (!user || !user.email) return alert('Utilizador não autenticado.');
+                try {
+                    await sendPasswordResetEmail(auth, user.email);
+                    alert('Email de redefinição de senha enviado para: ' + user.email);
+                } catch (err) { alert('Erro: ' + err.message); }
+            };
         }
 
-        document.getElementById('btn-login').addEventListener('click', () => {
+        const btnDelete = document.getElementById('btn-delete-account-sidebar') || document.getElementById('btn-delete-account') || document.getElementById('btn-delete-account-2');
+        if (btnDelete) {
+            btnDelete.onclick = async () => {
+                const user = auth.currentUser;
+                if (!user) return;
+                if (!confirm("TEM A CERTEZA?\n\nEsta ação irá eliminar todos os seus dados e a sua conta permanentemente.\n\nEsta operação é irreversível.")) return;
+                try {
+                    const uid = user.uid;
+                    await user.delete();
+                    localStorage.removeItem(getStoreKey(uid));
+                    localStorage.removeItem(STORE_KEY_PREFIX + '_last_id');
+                    alert('A sua conta e dados foram eliminados permanentemente.');
+                    location.reload();
+                } catch (err) {
+                    console.error(err);
+                    alert('Para eliminar a conta, precisa de ter feito login recentemente. Por favor, saia da conta, entre de novo e tente eliminar novamente.');
+                }
+            };
+        }
 
-            const id = document.getElementById('l-email').value.trim();
 
-            const pass = document.getElementById('l-password').value;
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const uid = user.uid;
+                const email = user.email;
+                STORE_KEY = getStoreKey(uid);
+                localStorage.setItem(STORE_KEY_PREFIX + '_last_id', uid);
+                localStorage.setItem(STORE_KEY_PREFIX + '_last_email', email);
+                
+                // MIGRATION: Se houver dados no email antigo mas não no UID, movemos
+                if (email) {
+                    const emailKey = getStoreKey(email);
+                    const oldData = localStorage.getItem(emailKey);
+                    if (oldData && !localStorage.getItem(STORE_KEY)) {
+                        localStorage.setItem(STORE_KEY, oldData);
+                        console.log('Migração de dados (Email -> UID) concluída.');
+                    }
+                }
 
-            if (!id || pass.length < 4) return alert('Preenche o nome/email e uma senha com pelo menos 4 caracteres.');
+                loadUserDB(uid);
+                DB.auth = true;
+                const emailLblH = document.getElementById('lbl-user-email');
+                const emailLblS = document.getElementById('lbl-user-email-sidebar');
+                if (emailLblH) emailLblH.innerText = email || 'An\u00F3nimo';
+                if (emailLblS) emailLblS.innerText = email || 'An\u00F3nimo';
 
-            localStorage.setItem(STORE_KEY_PREFIX + '_last_id', id);
+                // Sync Sidebar Photo
+                const sidePhoto = document.getElementById('sidebar-photo');
+                if (sidePhoto && DB.config.photo) {
+                    sidePhoto.innerHTML = `<img src="${DB.config.photo}" />`;
+                }
 
-            loadUserDB(id);
+                // ADMIN CHECK
+                const isAdmin = email === 'admin@vwheel.pt';
+                const mgmtNav = document.getElementById('side-nav-mgmt');
+                if (mgmtNav) mgmtNav.classList.toggle('hidden', !isAdmin);
 
-            DB.auth = true;
-
-            DB_SAVE();
-
-            showApp();
-
+                showApp();
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+            }
         });
+
+        async function doLogout() {
+            try {
+                await signOut(auth);
+                localStorage.removeItem(STORE_KEY_PREFIX + '_last_id');
+                location.reload();
+            } catch (err) { console.error(err); }
+        }
+        window.doLogout = doLogout;
 
         const btnSaveOnb = document.getElementById('btn-save-onboarding');
 
@@ -524,55 +689,91 @@
                 document.getElementById('onb-matricula').style.boxShadow = 'none';
 
                 DB.config.nome = nome;
-
                 DB.config.matricula = matricula;
-
                 DB.config.civil = civil;
-
                 DB.config.filhos = filhos;
-
-                DB.config.base = L_BASE;
-
-                DB.config.diuValor = L_DIUTURNIDADE;
-
-                DB.config.diuturnidades = 0;
-
-                DB.config.tabela = 'nacional';
-
-                DB.config.heavyVehicle = false;
-
-                DB.config.noturnoEnabled = true;
-
-                DB.config.adrEnabled = false;
-
-                DB.config.cisternaEnabled = false;
-
-                DB.config.duoEnabled = false;
+                const sp = document.getElementById('onb-spouse-work');
+                if (sp) DB.config.spouseWork = sp.checked;
 
                 DB_SAVE();
-
                 document.getElementById('onboarding-overlay').classList.add('hidden');
-
-                initApp();
-
-                navTo('profile');
-
-                buildCalendar();
-
+                showApp();
             };
-
         }
+
+        // --- Photo Handling ---
+        const fileIn = document.getElementById('file-avatar');
+        if (fileIn) {
+            fileIn.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const size = 150;
+                        canvas.width = size;
+                        canvas.height = size;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, size, size);
+                        const base64 = canvas.toDataURL('image/webp', 0.8);
+                        DB.config.photo = base64;
+                        DB_SAVE();
+                        updatePhotoUI();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+        }
+
+        function updatePhotoUI() {
+            const p = DB.config.photo;
+            if (p) {
+                ['onb-photo-circle', 'cfg-photo-circle', 'signup-photo-circle', 'sidebar-photo'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = `<img src="${p}" />`;
+                });
+            }
+        }
+        window.updatePhotoUI = updatePhotoUI;
+
+        // --- Spouse Toggle Logic ---
+        function setupSpouseToggles() {
+            const onbCivil = document.getElementById('onb-civil');
+            const cfgCivil = document.getElementById('cfg-civil');
+            const handle = (select, blockId) => {
+                const block = document.getElementById(blockId);
+                if (block) block.classList.toggle('hidden', select.value !== 'casado');
+            };
+            if (onbCivil) onbCivil.onchange = () => handle(onbCivil, 'onb-spouse-block');
+            if (cfgCivil) cfgCivil.onchange = () => handle(cfgCivil, 'cfg-spouse-block');
+        }
+        setupSpouseToggles();
+
+
+         // ── NAVIGATION ──
 
         // ── NAVIGATION ──
 
         const views = ['calendar', 'profile', 'report'];
 
-        
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (sidebar) {
+                const isShowing = sidebar.classList.toggle('show');
+                if (backdrop) {
+                    if (isShowing) backdrop.classList.remove('hidden');
+                    else backdrop.classList.add('hidden');
+                }
+            }
+        }
+        window.toggleSidebar = toggleSidebar;
 
         function switchView(v, updateSidebar = true) {
             console.log('SWITCHVIEW V4.2:', v);
-
-            // Update Topbar Title
             const topTitleEl = document.getElementById('main-view-title');
             if (topTitleEl) {
                 const names = {
@@ -580,98 +781,57 @@
                     'calendar': 'Calendário',
                     'report': 'Relatório'
                 };
-                topTitleEl.innerText = names[v] || 'Vempire';
+                topTitleEl.innerText = names[v] || 'Vwheel';
             }
-
             const views = ['profile', 'calendar', 'report'];
             views.forEach(x => {
                 const el = document.getElementById('view-' + x);
                 if (el) el.classList.add('hidden');
             });
-
             const target = document.getElementById('view-' + v);
-
             if (target) target.classList.remove('hidden');
-
             if (updateSidebar) {
-
                 const ids = {
-
                     'profile': 'side-nav-profile',
-
                     'calendar': 'side-nav-calendar',
-
                     'report': 'side-nav-report'
-
                 };
-
                 document.querySelectorAll('.nav-item-new').forEach(item => {
-
                     item.classList.remove('active');
-
                 });
-
                 const targetId = ids[v];
-
                 const targetItem = document.getElementById(targetId);
-
                 if (targetItem) {
-
                     targetItem.classList.add('active');
-
-                    console.log('Highlight set on:', targetId);
-
                 }
-
             }
-
-            // Close sidebar on mobile after clicking an item
-
             if (window.innerWidth <= 768) {
-
                 const sidebar = document.querySelector('.sidebar');
-
                 if (sidebar) sidebar.classList.remove('show');
-
                 const backdrop = document.getElementById('sidebar-backdrop');
-
                 if (backdrop) backdrop.classList.add('hidden');
-
             }
-
             window.scrollTo(0, 0);
-
             if (v === 'report') renderReportUI();
-
             if (v === 'calendar') buildCalendar();
-
         }
+        window.switchView = switchView;
+        window.navTo = switchView;
 
-        function toggleSidebar() {
-
-            const sidebar = document.querySelector('.sidebar');
-
-            const backdrop = document.getElementById('sidebar-backdrop');
-
-            if (sidebar) {
-
-                const isShowing = sidebar.classList.toggle('show');
-
-                if (backdrop) {
-
-                    if (isShowing) backdrop.classList.remove('hidden');
-
-                    else backdrop.classList.add('hidden');
-
-                }
-
-            }
-
+        function openSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            if (modal) modal.classList.remove('hidden');
         }
+        window.openSettingsModal = openSettingsModal;
 
-        // Keep navTo for compatibility if referenced elsewhere, but point to switchView
-
-        function navTo(v) { switchView(v); }
+        function resetToLaw() {
+            if (!confirm('Repor valores por defeito da lei?')) return;
+            DB.config.base = L_BASE;
+            DB.config.diuValor = L_DIUTURNIDADE;
+            DB_SAVE();
+            initApp();
+        }
+        window.resetToLaw = resetToLaw;
 
         let currentRptView = 'month';
 
@@ -709,6 +869,89 @@
 
         let curDate = new Date();
 
+        // --- EXPORTS GLOBAIS ---
+        window.delRow = delRow;
+        window.delKmEscalao = delKmEscalao;
+        window.updateRow = updateRow;
+        window.updateKmRow = updateKmRow;
+        window.addCustomMarker = addCustomMarker;
+        window.addKmEscalao = addKmEscalao;
+        window.deleteMarker = deleteMarker;
+        window.openSettingsModal = openSettingsModal;
+        window.closeSettingsModal = closeSettingsModal;
+
+        function delRow(type, idx) {
+            if (!confirm('Eliminar este registo?')) return;
+            if (type === 'markers') {
+                DB.config.markers.splice(idx, 1);
+            } else if (type === 'extra') {
+                DB.config.extras.splice(idx, 1);
+            }
+            DB_SAVE();
+            renderMgmtTables();
+            buildCalendar();
+        }
+
+        function updateRow(type, idx, field, val) {
+            if (type === 'markers') {
+                DB.config.markers[idx][field] = val;
+            } else if (type === 'extra') {
+                DB.config.extras[idx][field] = val;
+            }
+            DB_SAVE();
+        }
+
+        function delKmEscalao(idx) {
+            console.log('Tentativa de eliminar escalão KM idx:', idx);
+            if (!confirm('Eliminar este escalão de KM?')) return;
+            if (!DB.config.kmEscaloes) DB.config.kmEscaloes = [];
+            
+            DB.config.kmEscaloes.splice(idx, 1);
+            DB_SAVE();
+            renderMgmtTables();
+            console.log('Escalão eliminado.');
+        }
+
+        function updateKmRow(idx, field, val) {
+            if (!DB.config.kmEscaloes) DB.config.kmEscaloes = [];
+            DB.config.kmEscaloes[idx][field] = +val || 0;
+            DB_SAVE();
+        }
+
+        function addCustomMarker() {
+            const id = 'm_' + Date.now();
+            if (!DB.config.markers) DB.config.markers = [];
+            DB.config.markers.push({ id, label: 'Novo', color: '#6366f1', value: 0 });
+            DB_SAVE();
+            renderMgmtTables();
+        }
+
+        function deleteMarker(id) {
+            console.log('Tentativa de eliminar marcador:', id);
+            if (!confirm('Eliminar este marcador permanentemente?')) return;
+            
+            if (!DB.config.markers) return;
+            
+            const initialCount = DB.config.markers.length;
+            DB.config.markers = DB.config.markers.filter(m => m.id !== id);
+            
+            if (DB.config.markers.length < initialCount) {
+                console.log('Marcador eliminado com sucesso.');
+                DB_SAVE();
+                renderMgmtTables();
+                buildCalendar();
+            } else {
+                console.error('Falha ao encontrar marcador para eliminar:', id);
+            }
+        }
+
+        function addKmEscalao() {
+            if (!DB.config.kmEscaloes) DB.config.kmEscaloes = [];
+            DB.config.kmEscaloes.push({ ate: 99999, valor: 0 });
+            DB_SAVE();
+            renderMgmtTables();
+        }
+
         function initApp() {
 
             if (!DB.config) DB.config = { ...defaultDB.config };
@@ -730,15 +973,39 @@
             });
 
             refreshHeader();
+            updatePhotoUI();
+            
+            // Sync between Settings Modal 2 and Profile fields
+            const n2 = document.getElementById('cfg-nome-2');
+            const m2 = document.getElementById('cfg-matricula-2');
+            if (n2) { n2.value = DB.config.nome || ''; n2.oninput = () => { DB.config.nome = n2.value; DB_SAVE(); refreshHeader(); if (document.getElementById('cfg-nome')) document.getElementById('cfg-nome').value = n2.value; }; }
+            if (m2) { m2.value = DB.config.matricula || ''; m2.oninput = () => { DB.config.matricula = m2.value; DB_SAVE(); refreshHeader(); if (document.getElementById('cfg-matricula')) document.getElementById('cfg-matricula').value = m2.value; }; }
+            
+            const vHoraIn = document.getElementById('cfg-valor-hora');
+            if (vHoraIn) {
+                vHoraIn.value = DB.config.valorHora || 0;
+                vHoraIn.oninput = () => { DB.config.valorHora = +vHoraIn.value; DB_SAVE(); updateFixoUI(); };
+            }
+
+            const baseIn = document.getElementById('cfg-base');
+            if (baseIn) {
+                baseIn.value = DB.config.base || 1014.02;
+                baseIn.oninput = () => { DB.config.base = +baseIn.value; DB_SAVE(); updateFixoUI(); };
+            }
+            
+            const spouseCheck = document.getElementById('cfg-spouse-work');
+            if (spouseCheck) {
+                spouseCheck.checked = !!DB.config.spouseWork;
+                spouseCheck.onchange = () => { DB.config.spouseWork = spouseCheck.checked; DB_SAVE(); updateFixoUI(); };
+            }
+            
+            const btnDel2 = document.getElementById('btn-delete-account-2');
+            if (btnDel2) btnDel2.onclick = () => document.getElementById('btn-delete-account').click();
 
             const heavyCheck = document.getElementById('cfg-heavy-vehicle');
-
             if (heavyCheck) {
-
                 heavyCheck.checked = !!DB.config.heavyVehicle;
-
                 heavyCheck.onchange = () => { DB.config.heavyVehicle = heavyCheck.checked; DB_SAVE(); updateFixoUI(); };
-
             }
 
             const diutInput = document.getElementById('cfg-diuturnidades');
@@ -916,12 +1183,10 @@
             renderEmojiConfig();
 
             updateFixoUI();
-
-            updateLawWarnings();
-
             applyTheme();
 
         }
+        window.initApp = initApp;
 
         // ── MGMT TABLES V4 ──
 
@@ -1097,8 +1362,8 @@
                     const tr = document.createElement('tr');
                     const currentHue = hexToHue(m.color || '#6366f1');
                     tr.innerHTML = `
-                        <td><input type="text" class="mgmt-input" value="${m.label}" onchange="updateRow('markers', ${idx}, 'label', this.value)"></td>
-                        <td style="position:relative;">
+                        <td data-label="Identificação"><input type="text" class="mgmt-input" value="${m.label}" onchange="updateRow('markers', ${idx}, 'label', this.value)"></td>
+                        <td data-label="Cor" style="position:relative;">
                             <div id="preview-color-${idx}" class="color-swatch" style="background:${m.color}; margin: 0 auto;" 
                                 onclick="const pop=this.nextElementSibling; document.querySelectorAll('.spectrum-popover').forEach(p=>p!==pop&&p.classList.remove('show')); pop.classList.toggle('show')"></div>
                             <div class="spectrum-popover">
@@ -1107,8 +1372,12 @@
                                     oninput="const hex=hueToHex(this.value); document.getElementById('preview-color-${idx}').style.background=hex; updateRow('markers', ${idx}, 'color', hex)">
                             </div>
                         </td>
-                        <td><input type="number" class="mgmt-input" value="${m.value || 0}" onchange="updateRow('markers', ${idx}, 'value', +this.value)"></td>
-                        <td><span class="btn-del-row" onclick="delRow('markers', ${idx})">\u00D7</span></td>
+                        <td data-label="Valor (€)"><input type="number" class="mgmt-input" value="${m.value || 0}" onchange="updateRow('markers', ${idx}, 'value', +this.value)"></td>
+                        <td style="text-align:center;" data-label="Ação">
+                            <button class="btn-del-row-new" onclick="deleteMarker('${m.id}')" aria-label="Eliminar">
+                                ✕
+                            </button>
+                        </td>
                     `;
                     bMarkers.appendChild(tr);
                 });
@@ -1122,84 +1391,26 @@
                 bKm.innerHTML = '';
 
                 (DB.config.kmEscaloes || []).forEach((e, idx) => {
-
                     const tr = document.createElement('tr');
-
                     tr.innerHTML = `
-
-                        <td><input type="number" class="mgmt-input" value="${e.ate}" onchange="updateKmRow(${idx}, 'ate', +this.value)"></td>
-
-                        <td><input type="number" class="mgmt-input" value="${e.valor}" step="0.01" onchange="updateKmRow(${idx}, 'valor', +this.value)"></td>
-
-                        <td><span class="btn-del-row" onclick="delKmEscalao(${idx})">\u00D7</span></td>
-
+                        <td data-label="Até (km)"><input type="number" class="mgmt-input" value="${e.ate}" onchange="updateKmRow(${idx}, 'ate', +this.value)"></td>
+                        <td data-label="Valor (€)"><input type="number" class="mgmt-input" value="${e.valor}" step="0.01" onchange="updateKmRow(${idx}, 'valor', +this.value)"></td>
+                        <td style="text-align:center;" data-label="Ação">
+                            <button class="btn-del-row-new" onclick="delKmEscalao(${idx})" aria-label="Eliminar">
+                                ✕
+                            </button>
+                        </td>
                     `;
-
                     bKm.appendChild(tr);
-
                 });
 
             }
 
         }
 
-        function updateKmRow(idx, key, val) {
 
-            if (!DB.config.kmEscaloes || !DB.config.kmEscaloes[idx]) return;
 
-            DB.config.kmEscaloes[idx][key] = val;
 
-            DB_SAVE(); renderEngine();
-
-        }
-
-        function addKmEscalao() {
-
-            if (!DB.config.kmEscaloes) DB.config.kmEscaloes = [];
-
-            DB.config.kmEscaloes.push({ id: Date.now(), ate: 2000, valor: 0.15 });
-
-            DB_SAVE(); renderMgmtTables(); renderEngine();
-
-        }
-
-        function delKmEscalao(idx) {
-
-            DB.config.kmEscaloes.splice(idx, 1);
-
-            DB_SAVE(); renderMgmtTables(); renderEngine();
-
-        }
-
-        function updateRow(type, idx, key, val) {
-
-            if (!DB.config[type] || !DB.config[type][idx]) return;
-
-            DB.config[type][idx][key] = val;
-
-            DB_SAVE(); renderEngine();
-
-        }
-
-        function delRow(type, idx) {
-
-            if (!DB.config[type] || !confirm("Remover este item?")) return;
-
-            DB.config[type].splice(idx, 1);
-
-            DB_SAVE(); renderMgmtTables(); buildCalendar();
-
-        }
-
-        function addCustomMarker() {
-
-            if (!DB.config.markers) DB.config.markers = [...MARKERS];
-
-            DB.config.markers.push({ id: 'custom-' + Date.now(), label: 'Novo', color: '#cccccc', value: 0 });
-
-            DB_SAVE(); renderMgmtTables();
-
-        }
 
         function toggleKMUI() {
 
@@ -1221,7 +1432,7 @@
             set('lbl-comp-c61', '\u20AC ' + fmt(s.c61));
             set('lbl-comp-c75', '\u20AC ' + fmt(s.c75));
             const c75Label = document.querySelector('#lbl-c75-row .setting-label');
-            if (c75Label) c75Label.innerText = "Cl\u00E1usula TIR / Complemento";
+            if (c75Label) c75Label.innerHTML = "Cl\u00E1usula 75.\u00AA (TIR / Internac.) <small style='color:var(--green); font-size:0.6rem; vertical-align:middle;'>[AUTOMTICO]</small>";
 
             set('lbl-comp-perc', '\u20AC ' + fmt(s.compPerc));
 
@@ -1320,9 +1531,6 @@
             if (hdrF) hdrF.innerText = '\u20AC ' + fmt(s.liquidoTotal);
 
             renderEngine();
-
-            updateLawWarnings();
-
             refreshHeader();
 
         }
@@ -1428,6 +1636,9 @@
             const mKMT = document.getElementById('m-km-total-input');
 
             if (mKMT) mKMT.value = dayData.kmTotal || '';
+
+            const mHoras = document.getElementById('m-horas-extra-input');
+            if (mHoras) mHoras.value = dayData.horasExtra || '';
 
             // Limpar auxiliares para n\u00E3o herdar do dia anterior
 
@@ -1560,7 +1771,6 @@
                 div.style.border = '1px solid var(--border)';
 
                 div.innerHTML = `
-
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
 
                         <span style="font-size: 1.4rem;">${obj.icon}</span>
@@ -1602,12 +1812,13 @@
             if (!DB.events[mKey]) DB.events[mKey] = {};
 
             let km = +document.getElementById('m-km-total-input').value || 0;
+            let hExtra = +document.getElementById('m-horas-extra-input')?.value || 0;
 
             let sStart = document.getElementById('m-night-start')?.value || '';
 
             let sEnd = document.getElementById('m-night-end')?.value || '';
 
-            if (selectedMarkers.length === 0 && km === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd) {
+            if (selectedMarkers.length === 0 && km === 0 && hExtra === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd) {
 
                 delete DB.events[mKey][activeDay];
 
@@ -1618,7 +1829,7 @@
                     markers: selectedMarkers,
 
                     kmTotal: km,
-
+                    horasExtra: hExtra,
                     emojis: selectedEmojiObjs,
 
                     shiftStart: sStart,
@@ -1634,6 +1845,7 @@
         });
 
         function closeModal() { document.getElementById('modal-select').classList.add('hidden'); }
+        window.closeModal = closeModal;
 
         // Fechar balões ao clicar fora
         document.querySelectorAll('.modal-overlay').forEach(ov => {
@@ -1644,41 +1856,23 @@
 
         
 
-        function openSettingsModal() {
-
-            document.getElementById('modal-settings').classList.remove('hidden');
-
-        }
 
         
 
         function closeSettingsModal() {
-
             document.getElementById('modal-settings').classList.add('hidden');
-
-            // Force refresh of UI components to reflect changes in Civil Status / Children
-
             updateFixoUI();
-
             renderEngine();
-
         }
+        window.closeSettingsModal = closeSettingsModal;
 
         function setTheme(t) {
-
             DB.config.theme = t;
-
             DB_SAVE();
-
             applyTheme();
-
-            
-
-            // Re-render charts for theme consistency (font colors etc)
-
             if (typeof renderUICharts === 'function') renderUICharts();
-
         }
+        window.setTheme = setTheme;
 
         function applyTheme() {
 
@@ -1814,6 +2008,7 @@
             let totalAjudasManuais = 0;
 
             let totalExtras = 0;
+            let totalHoursMonth = 0;
 
             let totalNightHoursMonth = 0;
 
@@ -1866,7 +2061,7 @@
                 const km = (evt.kmTotal || 0);
 
                 totalKM += km;
-
+                totalHoursMonth += (evt.horasExtra || 0);
                 weekKMCount[weekIdx] += km;
 
                 // 4. B\u00F3nus Noturno Real (Cl\u00E1usula 51.\u00AA - 25%)
@@ -1932,24 +2127,22 @@
 
             let duoLiquido = duo.total - ss2 - irs2;
 
-            // Final: Sal\u00E1rio + Duod\u00E9cimos + Isentos (Ajudas + KM + Extras)
-
-            let finalLiquidoReceber = salLiquido + duoLiquido + totalAjudasManuais + totalKmGains + totalExtras;
+            const totalHoursGains = totalHoursMonth * (DB.config.valorHora || 0);
+            let finalLiquidoReceber = salLiquido + duoLiquido + totalAjudasManuais + totalKmGains + totalExtras + totalHoursGains;
 
             return {
-
-                totalKM, totalAjudasManuais, totalExtras, totalKmGains,
-
+                bruto: bruto,
+                totalKmGains: totalKmGains,
+                totalHoursGains: totalHoursGains,
+                totalAjudasManuais: totalAjudasManuais,
+                totalExtras: totalExtras,
+                salLiquido, 
+                duoLiquido, 
+                fixoLiquido: salLiquido, 
                 finalLiquidoReceber,
-
-                salLiquido, duoLiquido, fixoLiquido: salLiquido, // compat
-
                 bruto, duo,
-
                 impostosRetidos: ss1 + ss2 + irs1 + irs2,
-
                 weekData, weekKM: weekKMCount
-
             };
 
         }
@@ -1997,6 +2190,9 @@
                 const rKMVal = document.getElementById('rpt-km-val');
 
                 if (rKMVal) rKMVal.innerText = fmt(res.totalKmGains);
+
+                const rHrsVal = document.getElementById('rpt-horas-val');
+                if (rHrsVal) rHrsVal.innerText = fmt(res.totalHoursGains);
 
                 // Duod\u00E9cimos row (show if enabled OR if there is an integral subsidy payment this month)
 
@@ -2423,7 +2619,7 @@
 
             // Header Info
 
-            csvRows.push(`Relat\u00F3rio Journey Tracker - ${monthName}`);
+            csvRows.push(`Relat\u00F3rio Vwheel PRO - ${monthName}`);
 
             csvRows.push(`Motorista:;${DB.config.nome || 'N\u00E3o Definido'}`);
 
@@ -2529,8 +2725,8 @@
             const y = curDate.getFullYear();
             const mFull = new Intl.DateTimeFormat('pt-PT', { month: 'long' }).format(curDate);
             const title = type === 'year' 
-                ? `*Relat\u00f3rio ANUAL Journey Tracker - ${y}*`
-                : `*Relat\u00f3rio Journey Tracker - ${mFull} ${y}*`;
+                ? `*Relat\u00f3rio ANUAL Vwheel PRO - ${y}*`
+                : `*Relat\u00f3rio Vwheel PRO - ${mFull} ${y}*`;
 
             return `${title}\n` +
                 `Matr\u00edcula: ${DB.config.matricula || '-'}\n` +
@@ -2540,7 +2736,7 @@
                 `*Ajudas:* \u20ac ${(res.totalAjudasManuais + (res.totalKmGains || 0)).toFixed(2)}\n` +
                 `*Outros:* \u20ac ${res.totalExtras.toFixed(2)}\n\n` +
                 `*TOTAL A RECEBER:* \u20ac ${res.finalLiquidoReceber.toFixed(2)}\n\n` +
-                `_Gerado por Journey Tracker 2026_`;
+                `_Gerado por Vwheel PRO 2026_`;
         }
 
         document.getElementById('btn-export-wa').onclick = () => {
@@ -2557,34 +2753,17 @@
         };
 
         // ── AUTO-RESTAURAR SESSÃO ──
-
         (function() {
-
             const lastId = localStorage.getItem(STORE_KEY_PREFIX + '_last_id');
-
+            const lastEmail = localStorage.getItem(STORE_KEY_PREFIX + '_last_email');
             if (lastId) {
-
                 const emailInput = document.getElementById('l-email');
-
-                if (emailInput) emailInput.value = lastId;
-
+                if (emailInput && lastEmail) emailInput.value = lastEmail;
                 loadUserDB(lastId);
-
                 if (DB.auth) { showApp(); return; }
-
             }
-
-            // Sem sess\u00E3o: mostrar login
-
         })();
 
-        function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('show');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            if (backdrop) {
-                backdrop.classList.toggle('hidden');
-            }
-        }
 
         window.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
