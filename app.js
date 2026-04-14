@@ -1978,6 +1978,12 @@ import {
                     if (evt.kmTotal > 0) {
                         btn.innerHTML += `<div class="day-km-tag">${evt.kmTotal}</div>`;
                     }
+                    if (evt.kmBonus !== undefined) {
+                        btn.innerHTML += `<div style="position:absolute; top:2px; left:2px; background:var(--accent); color:white; font-size:0.6rem; padding:2px 4px; border-radius:4px; font-weight:800; z-index:5;">€</div>`;
+                    }
+                    if (evt.horasExtra > 0 || evt.horasValor !== undefined) {
+                        btn.innerHTML += `<div style="position:absolute; top:2px; right:20px; background:#facc15; color:#000; font-size:0.6rem; padding:2px 4px; border-radius:4px; font-weight:800; z-index:5;">H</div>`;
+                    }
 
                     if (evt.emojis && evt.emojis.length > 0) {
 
