@@ -10,7 +10,8 @@
             sendPasswordResetEmail,
             signOut,
             setPersistence,
-            browserLocalPersistence
+            browserLocalPersistence,
+            browserSessionPersistence
         } from 'firebase/auth';
 
         // TODO: SUBSTITUIR PELO TEU CONFIG DA CONSOLA FIREBASE
@@ -494,6 +495,12 @@
             const pass = document.getElementById('l-password').value;
             const name = document.getElementById('l-name')?.value.trim();
             const passConf = document.getElementById('l-password-confirm')?.value;
+            const remember = document.getElementById('l-remember')?.checked;
+
+            try {
+                const persistenceMode = remember ? browserLocalPersistence : browserSessionPersistence;
+                await setPersistence(auth, persistenceMode);
+            } catch (e) { console.error('Erro de persistência:', e); }
 
             // BYPASS PARA TESTE (ADMIN)
             if (email.toLowerCase() === 'admin@vwheel.pt' && pass.trim() === 'Naoqueresnadataloi.22') {
