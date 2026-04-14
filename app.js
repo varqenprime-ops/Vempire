@@ -1373,7 +1373,7 @@
                             </div>
                         </td>
                         <td data-label="Valor (€)"><input type="number" class="mgmt-input" value="${m.value || 0}" onchange="updateRow('markers', ${idx}, 'value', +this.value)"></td>
-                        <td style="text-align:center;" data-label="Ação">
+                        <td style="text-align:center;">
                             <button class="btn-del-row-new" onclick="deleteMarker('${m.id}')" aria-label="Eliminar">
                                 ✕
                             </button>
@@ -1395,7 +1395,7 @@
                     tr.innerHTML = `
                         <td data-label="Até (km)"><input type="number" class="mgmt-input" value="${e.ate}" onchange="updateKmRow(${idx}, 'ate', +this.value)"></td>
                         <td data-label="Valor (€)"><input type="number" class="mgmt-input" value="${e.valor}" step="0.01" onchange="updateKmRow(${idx}, 'valor', +this.value)"></td>
-                        <td style="text-align:center;" data-label="Ação">
+                        <td style="text-align:center;">
                             <button class="btn-del-row-new" onclick="delKmEscalao(${idx})" aria-label="Eliminar">
                                 ✕
                             </button>
