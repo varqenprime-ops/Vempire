@@ -1387,19 +1387,21 @@ import {
         }
 
         function hexToHue(hex) {
-            // Conversão simples aproximada para colocar o slider na posição certa
             let r = parseInt(hex.slice(1, 3), 16) / 255;
             let g = parseInt(hex.slice(3, 5), 16) / 255;
             let b = parseInt(hex.slice(5, 7), 16) / 255;
             let max = Math.max(r, g, b), min = Math.min(r, g, b);
-            let h, d = max - min;
-            if (d === 0) h = 0;
-            else if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
-            else if (max === g) h = (b - r) / d + 2;
-            else h = (r - g) / d + 4;
-            return Math.round(h * 60);
+            let h = 0, d = max - min;
+            if (d !== 0) {
+                if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+                else if (max === g) h = ((b - r) / d + 2) * 60;
+                else if (max === b) h = ((r - g) / d + 4) * 60;
+            }
+            return Math.round(h);
         }
-
+        
+        window.hueToHex = hueToHex;
+        window.hexToHue = hexToHue;
         function renderMgmtTables() {
 
             const bMarkers = document.getElementById('body-markers');
