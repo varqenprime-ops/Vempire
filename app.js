@@ -16,12 +16,11 @@
 
         // TODO: SUBSTITUIR PELO TEU CONFIG DA CONSOLA FIREBASE
         const firebaseConfig = {
-            apiKey: "AIzaSyCXB_R1Z2fK1vX3XpW6Q5G0lA_FzEwM8M",
+            apiKey: "AIzaSyAz4coRINN6JbCyDpNEIm0C_Rdyk6mE-qw",
             authDomain: "vempire-e74c8.firebaseapp.com",
             projectId: "vempire-e74c8",
-            storageBucket: "vempire-e74c8.appspot.com",
-            messagingSenderId: "123018257008",
-            appId: "1:123018257008:web:786968f9a92440ed3550e5"
+            storageBucket: "vempire-e74c8.firebasestorage.app",
+            messagingSenderId: "411369926533"
         };
 
         const app = initializeApp(firebaseConfig);
