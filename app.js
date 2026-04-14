@@ -1692,6 +1692,12 @@ import {
             const mHoras = document.getElementById('m-horas-extra-input');
             if (mHoras) mHoras.value = dayData.horasExtra || '';
 
+            const mKMBonus = document.getElementById('m-km-bonus-input');
+            if (mKMBonus) mKMBonus.value = dayData.kmBonus || '';
+
+            const mHorasValor = document.getElementById('m-horas-valor-input');
+            if (mHorasValor) mHorasValor.value = dayData.horasValor || '';
+
             // Limpar auxiliares para n\u00E3o herdar do dia anterior
 
             const mKMS = document.getElementById('m-km-start');
@@ -1865,31 +1871,25 @@ import {
 
             let km = +document.getElementById('m-km-total-input').value || 0;
             let hExtra = +document.getElementById('m-horas-extra-input')?.value || 0;
+            let kmBonus = document.getElementById('m-km-bonus-input')?.value;
+            let hValor = document.getElementById('m-horas-valor-input')?.value;
 
             let sStart = document.getElementById('m-night-start')?.value || '';
-
             let sEnd = document.getElementById('m-night-end')?.value || '';
 
-            if (selectedMarkers.length === 0 && km === 0 && hExtra === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd) {
-
+            if (selectedMarkers.length === 0 && km === 0 && hExtra === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd && !kmBonus && !hValor) {
                 delete DB.events[mKey][activeDay];
-
             } else {
-
                 DB.events[mKey][activeDay] = {
-
                     markers: selectedMarkers,
-
                     kmTotal: km,
+                    kmBonus: kmBonus !== "" ? +kmBonus : undefined,
                     horasExtra: hExtra,
+                    horasValor: hValor !== "" ? +hValor : undefined,
                     emojis: selectedEmojiObjs,
-
                     shiftStart: sStart,
-
                     shiftEnd: sEnd
-
                 };
-
             }
 
             DB_SAVE(); closeModal(); buildCalendar();
@@ -1988,6 +1988,12 @@ import {
                     if (evt.kmTotal > 0) {
                         btn.innerHTML += `<div class="day-km-tag">${evt.kmTotal}</div>`;
                     }
+                    if (evt.kmBonus !== undefined) {
+                        btn.innerHTML += `<div style="position:absolute; top:2px; left:2px; background:var(--accent); color:white; font-size:0.6rem; padding:2px 4px; border-radius:4px; font-weight:800; z-index:5;">€</div>`;
+                    }
+                    if (evt.horasExtra > 0 || evt.horasValor !== undefined) {
+                        btn.innerHTML += `<div style="position:absolute; top:2px; right:20px; background:#facc15; color:#000; font-size:0.6rem; padding:2px 4px; border-radius:4px; font-weight:800; z-index:5;">H</div>`;
+                    }
 
                     if (evt.emojis && evt.emojis.length > 0) {
 
@@ -2063,6 +2069,9 @@ import {
             let totalHoursMonth = 0;
 
             let totalNightHoursMonth = 0;
+            let totalKmGains = 0;
+            let dayHoursGains = 0;
+            let kmSujeitoAEscalao = 0;
 
             let weekData = [0, 0, 0, 0, 0];
 
@@ -2108,33 +2117,35 @@ import {
 
                 }
 
-                // 3. Contagem de KM
-
+                // 3. Contagem de KM e Horas com Bónus Dinâmico
                 const km = (evt.kmTotal || 0);
-
-                totalKM += km;
-                totalHoursMonth += (evt.horasExtra || 0);
-                weekKMCount[weekIdx] += km;
-
-                // 4. B\u00F3nus Noturno Real (Cl\u00E1usula 51.\u00AA - 25%)
-
-                if (!DB.config.noturnoEnabled && evt.shiftStart && evt.shiftEnd) {
-
-                    totalNightHoursMonth += calculateNightHours(evt.shiftStart, evt.shiftEnd);
-
+                const hExtra = (evt.horasExtra || 0);
+                
+                // Se houver bónus no dia, usa esse. Se não, guarda para calcular amanhã nos escalões.
+                if (evt.kmBonus !== undefined) {
+                    totalKmGains += km * evt.kmBonus;
+                } else {
+                    kmSujeitoAEscalao += km;
                 }
 
+                // Se houver valor hora no dia, usa esse. Se não, usa o global.
+                const hRate = evt.horasValor !== undefined ? evt.horasValor : (DB.config.valorHora || 0);
+                dayHoursGains += hExtra * hRate;
+
+                totalKM += km;
+                totalHoursMonth += hExtra;
+                weekKMCount[weekIdx] += km;
+
+                // 4. Bónus Noturno Real (Cláusula 51.ª - 25%)
+                if (!DB.config.noturnoEnabled && evt.shiftStart && evt.shiftEnd) {
+                    totalNightHoursMonth += calculateNightHours(evt.shiftStart, evt.shiftEnd);
+                }
             }
 
-            const base = DB.config.base || L_BASE;
-
-            const nightBonusReal = totalNightHoursMonth * (base / 173.33) * 0.25;
-
-            let totalKmGains = 0;
+            // Cálculo de Escalões para KM sem bónus fixo de dia
             if (DB.config.kmEnabled && DB.config.kmEscaloes && DB.config.kmEscaloes.length > 0) {
-                // Ordenar por limite para garantir cálculo correto
                 const sortedTiers = [...DB.config.kmEscaloes].sort((a, b) => a.ate - b.ate);
-                let kmRemaining = totalKM;
+                let kmRemaining = kmSujeitoAEscalao;
                 let prevLimit = 0;
                 for (const tier of sortedTiers) {
                     if (kmRemaining <= 0) break;
@@ -2144,14 +2155,14 @@ import {
                     kmRemaining -= kmInTier;
                     prevLimit = tier.ate;
                 }
-            } else if (DB.config.kmEnabled) {
-                // Fallback (legado)
-                if (totalKM <= 1500) {
-                    totalKmGains = totalKM * 0.10;
-                } else {
-                    totalKmGains = (1500 * 0.10) + ((totalKM - 1500) * 0.20);
-                }
             }
+
+            const base = DB.config.base || L_BASE;
+
+            const nightBonusReal = totalNightHoursMonth * (base / 173.33) * 0.25;
+
+            // Cálculo final movido para dentro do loop para suportar bónus por dia.
+
 
             // GAVETA 1: Sal\u00E1rio Mensal
 
@@ -2179,7 +2190,7 @@ import {
 
             let duoLiquido = duo.total - ss2 - irs2;
 
-            const totalHoursGains = totalHoursMonth * (DB.config.valorHora || 0);
+            const totalHoursGains = dayHoursGains;
             let finalLiquidoReceber = salLiquido + duoLiquido + totalAjudasManuais + totalKmGains + totalExtras + totalHoursGains;
 
             return {
