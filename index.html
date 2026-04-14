@@ -1349,6 +1349,19 @@
 
     <script type="module" src="app.js?v=700"></script>
 
+    <script>
+        // Safety Fallback: Se o Firebase demorar mais de 6 segundos a responder (erro de rede/config),
+        // forçamos a ocultação do ecrã de loading para permitir login manual.
+        setTimeout(() => {
+            const loading = document.getElementById('loading-screen');
+            if (loading && !loading.classList.contains('hidden')) {
+                console.warn('Timeout de segurança: Ocultando ecrã de carregamento manualmente.');
+                loading.classList.add('hidden');
+                document.getElementById('login-screen')?.classList.remove('hidden');
+            }
+        }, 6000);
+    </script>
+
 </body>
 
 </html>
