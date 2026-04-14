@@ -1692,12 +1692,6 @@ import {
             const mHoras = document.getElementById('m-horas-extra-input');
             if (mHoras) mHoras.value = dayData.horasExtra || '';
 
-            const mKMBonus = document.getElementById('m-km-bonus-input');
-            if (mKMBonus) mKMBonus.value = dayData.kmBonus || '';
-
-            const mHorasValor = document.getElementById('m-horas-valor-input');
-            if (mHorasValor) mHorasValor.value = dayData.horasValor || '';
-
             // Limpar auxiliares para n\u00E3o herdar do dia anterior
 
             const mKMS = document.getElementById('m-km-start');
@@ -1871,21 +1865,17 @@ import {
 
             let km = +document.getElementById('m-km-total-input').value || 0;
             let hExtra = +document.getElementById('m-horas-extra-input')?.value || 0;
-            let kmBonus = document.getElementById('m-km-bonus-input')?.value;
-            let hValor = document.getElementById('m-horas-valor-input')?.value;
 
             let sStart = document.getElementById('m-night-start')?.value || '';
             let sEnd = document.getElementById('m-night-end')?.value || '';
 
-            if (selectedMarkers.length === 0 && km === 0 && hExtra === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd && !kmBonus && !hValor) {
+            if (selectedMarkers.length === 0 && km === 0 && hExtra === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd) {
                 delete DB.events[mKey][activeDay];
             } else {
                 DB.events[mKey][activeDay] = {
                     markers: selectedMarkers,
                     kmTotal: km,
-                    kmBonus: kmBonus !== "" ? +kmBonus : undefined,
                     horasExtra: hExtra,
-                    horasValor: hValor !== "" ? +hValor : undefined,
                     emojis: selectedEmojiObjs,
                     shiftStart: sStart,
                     shiftEnd: sEnd
@@ -1987,12 +1977,6 @@ import {
                 if (evt) {
                     if (evt.kmTotal > 0) {
                         btn.innerHTML += `<div class="day-km-tag">${evt.kmTotal}</div>`;
-                    }
-                    if (evt.kmBonus !== undefined) {
-                        btn.innerHTML += `<div style="position:absolute; top:2px; left:2px; background:var(--accent); color:white; font-size:0.6rem; padding:2px 4px; border-radius:4px; font-weight:800; z-index:5;">€</div>`;
-                    }
-                    if (evt.horasExtra > 0 || evt.horasValor !== undefined) {
-                        btn.innerHTML += `<div style="position:absolute; top:2px; right:20px; background:#facc15; color:#000; font-size:0.6rem; padding:2px 4px; border-radius:4px; font-weight:800; z-index:5;">H</div>`;
                     }
 
                     if (evt.emojis && evt.emojis.length > 0) {
