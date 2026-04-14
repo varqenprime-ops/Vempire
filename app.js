@@ -847,7 +847,7 @@ import {
         window.navTo = switchView;
 
         function openSettingsModal() {
-            const modal = document.getElementById('settings-modal');
+            const modal = document.getElementById('modal-settings');
             if (modal) modal.classList.remove('hidden');
         }
         window.openSettingsModal = openSettingsModal;
@@ -1025,6 +1025,28 @@ import {
             if (spouseCheck) {
                 spouseCheck.checked = !!DB.config.spouseWork;
                 spouseCheck.onchange = () => { DB.config.spouseWork = spouseCheck.checked; DB_SAVE(); updateFixoUI(); };
+            }
+
+            const cfgCivilSelect = document.getElementById('cfg-civil');
+            if (cfgCivilSelect) {
+                cfgCivilSelect.value = DB.config.civil || 'solteiro';
+                cfgCivilSelect.onchange = () => { 
+                    DB.config.civil = cfgCivilSelect.value;
+                    const spouseBlock = document.getElementById('cfg-spouse-block');
+                    if(spouseBlock) spouseBlock.classList.toggle('hidden', cfgCivilSelect.value !== 'casado');
+                    DB_SAVE(); 
+                    updateFixoUI(); 
+                };
+            }
+
+            const cfgFilhosIn = document.getElementById('cfg-filhos');
+            if (cfgFilhosIn) {
+                cfgFilhosIn.value = DB.config.filhos || 0;
+                cfgFilhosIn.oninput = () => { 
+                    DB.config.filhos = parseInt(cfgFilhosIn.value) || 0; 
+                    DB_SAVE(); 
+                    updateFixoUI(); 
+                };
             }
             
             const btnDel2 = document.getElementById('btn-delete-account-2');
