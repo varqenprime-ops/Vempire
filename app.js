@@ -1,18 +1,21 @@
 
-        import { initializeApp } from 'firebase/app';
-        import { 
-            getAuth, 
-            onAuthStateChanged, 
-            signInWithPopup, 
-            GoogleAuthProvider,
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            sendPasswordResetEmail,
-            signOut,
-            setPersistence,
-            browserLocalPersistence,
-            browserSessionPersistence
-        } from 'firebase/auth';
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    onAuthStateChanged, 
+    signOut,
+    setPersistence,
+    browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    getDoc, 
+    onSnapshot 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // TODO: SUBSTITUIR PELO TEU CONFIG DA CONSOLA FIREBASE
         const firebaseConfig = {
@@ -20,11 +23,13 @@
             authDomain: "vempire-e74c8.firebaseapp.com",
             projectId: "vempire-e74c8",
             storageBucket: "vempire-e74c8.firebasestorage.app",
-            messagingSenderId: "411369926533"
+            messagingSenderId: "411369926533",
+            appId: "1:411369926533:web:a1b2c3d4e5f6g7h8i9j0k1"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
         
         // Ativar Persistência Local (Sessão não expira ao fechar browser)
         setPersistence(auth, browserLocalPersistence).catch(console.error);
@@ -239,12 +244,18 @@
 
         let uiBarInstance = null;
 
-        function DB_SAVE() {
-
-            // Guardar config E eventos no localStorage
-
+        async function DB_SAVE() {
+            // Guardar config E eventos no localStorage (backup local rápido)
             localStorage.setItem(STORE_KEY, JSON.stringify(DB));
 
+            // Sincronizar com a Nuvem (Firestore) se estiver logado
+            if (auth.currentUser) {
+                try {
+                    await setDoc(doc(db, "users", auth.currentUser.uid), DB);
+                } catch (e) {
+                    console.error("Erro a sincronizar com a nuvem:", e);
+                }
+            }
         }
 
         // ════════════════════════════════════════════════════
@@ -501,26 +512,8 @@
                 await setPersistence(auth, persistenceMode);
             } catch (e) { console.error('Erro de persistência:', e); }
 
-            // BYPASS PARA TESTE (ADMIN)
-            if (email.toLowerCase() === 'admin@vwheel.pt' && pass.trim() === 'Naoqueresnadataloi.22') {
-                const adminUid = 'admin_master_vwheel';
-                STORE_KEY = getStoreKey(adminUid);
-                localStorage.setItem(STORE_KEY_PREFIX + '_last_id', adminUid);
-                localStorage.setItem(STORE_KEY_PREFIX + '_last_email', email); 
-                loadUserDB(adminUid);
-                DB.auth = true;
-                const emailLbl = document.getElementById('lbl-user-email') || document.getElementById('lbl-user-email-sidebar');
-                if (emailLbl) emailLbl.innerText = email;
-                const sidePhoto = document.getElementById('sidebar-photo');
-                if (sidePhoto && DB.config.photo) sidePhoto.innerHTML = `<img src="${DB.config.photo}" />`;
-                const mgmtNav = document.getElementById('side-nav-mgmt');
-                if (mgmtNav) mgmtNav.classList.remove('hidden');
-                showApp();
-                return;
-            }
-
             if (!email || (type !== 'google' && pass.length < 6)) {
-                return alert('Por favor, introduz um email válido e uma senha com pelo menos 6 caracteres.');
+                return alert('Por favor, introduz o email admin@vwheel.pt e a password para entrar.');
             }
 
             if (currentAuthMode === 'signup' && type === 'signup') {
