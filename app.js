@@ -34,6 +34,16 @@ import {
         // Ativar Persistência Local (Sessão não expira ao fechar browser)
         setPersistence(auth, browserLocalPersistence).catch(console.error);
 
+        // Otimização para offline no Safari/iPhone
+        import { enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.warn("Múltiplas abas abertas, persistência desativada.");
+            } else if (err.code == 'unimplemented') {
+                console.warn("O navegador não suporta persistência offline.");
+            }
+        });
+
         const STORE_KEY_PREFIX = 'journey-tracker-pro-v2';
 
         window.openModal = (id) => {
@@ -609,27 +619,25 @@ import {
                 localStorage.setItem(STORE_KEY_PREFIX + '_last_id', uid);
                 localStorage.setItem(STORE_KEY_PREFIX + '_last_email', email);
                 
-                // Firestore Cloud Sync - FORÇAR REDE para garantir troca de telemóvel
+                // Firestore Cloud Sync - Robusto para troca de telemóvel
                 try {
                     const docRef = doc(db, "users", uid);
-                    // getDoc padrão tenta cache primeiro se estiver offline. 
-                    // Vamos garantir que ele sabe se falhou a rede.
+                    // Tentar obter dados do servidor com fallback imediato
                     const docSnap = await getDoc(docRef);
                     
                     if (docSnap.exists()) {
-                        console.log("DADOS RECUPERADOS: Nuvem -> Telemóvel");
                         DB = docSnap.data();
                         localStorage.setItem(STORE_KEY, JSON.stringify(DB));
-                        // Alerta de sucesso apenas para diagnóstico, depois removemos
-                        alert("Sincronização OK: Os teus dados foram recuperados da Nuvem!");
+                        console.log("Recuperado da Nuvem.");
                     } else {
-                        console.log("Nuvem Vazia: A iniciar novo perfil para este email.");
+                        // Novo utilizador ou nuvem sem dados ainda
                         loadUserDB(uid);
-                        await setDoc(docRef, DB); 
+                        // Tentar salvar os dados atuais locais para a nuvem
+                        setDoc(docRef, DB).catch(e => console.warn("Aguardando rede para subir dados..."));
                     }
                 } catch (e) {
-                    console.error("ERRO CRÍTICO DE SINCRONIZAÇÃO:", e);
-                    alert("ERRO DE REDE: O Vwheel não conseguiu ligar-se à Nuvem. Verifica a tua internet. Erro: " + e.message);
+                    console.warn("Offline ou Erro de Rede, a usar Backup Local:", e.message);
+                    // O trunfo: se falhar a rede, carrega o que tens no telemóvel
                     loadUserDB(uid);
                 }
 
