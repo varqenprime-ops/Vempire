@@ -152,7 +152,7 @@ import {
                 ],
                 valorHora: 0,
                 markers: JSON.parse(JSON.stringify(MARKERS)),
-                kmBonusList: [{ name: 'Internacional', value: 0.09 }]
+                kmBonusList: []
             },
             events: {}
         };
@@ -1721,10 +1721,7 @@ import {
             // Popular seletor de bónus da biblioteca
             const mBonusSel = document.getElementById('m-km-bonus-select');
             if (mBonusSel) {
-                mBonusSel.innerHTML = ''; // Removido (Nenhum) conforme pedido
-                if (!DB.config.kmBonusList || DB.config.kmBonusList.length === 0) {
-                    DB.config.kmBonusList = [{ name: 'Internacional', value: 0.09 }];
-                }
+                mBonusSel.innerHTML = '<option value="">(Nenhum)</option>'; 
                 (DB.config.kmBonusList || []).forEach(b => {
                     const opt = document.createElement('option');
                     opt.value = b.value;
@@ -1737,15 +1734,11 @@ import {
                 if (row) row.classList.toggle('hidden', !DB.config.kmBonusList || DB.config.kmBonusList.length === 0);
             }
 
-            // Limpar auxiliares para n\u00E3o herdar do dia anterior
-
             const mKMS = document.getElementById('m-km-start');
-
-            if (mKMS) mKMS.value = '';
+            if (mKMS) mKMS.value = dayData.kmStart || '';
 
             const mKME = document.getElementById('m-km-end');
-
-            if (mKME) mKME.value = '';
+            if (mKME) mKME.value = dayData.kmEnd || '';
 
             renderMarkersInModal();
 
@@ -1918,12 +1911,17 @@ import {
             let sStart = document.getElementById('m-night-start')?.value || '';
             let sEnd = document.getElementById('m-night-end')?.value || '';
 
-            if (selectedMarkers.length === 0 && km === 0 && hExtra === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd && kmBonus === undefined) {
+            let kmStart = +document.getElementById('m-km-start')?.value || 0;
+            let kmEnd = +document.getElementById('m-km-end')?.value || 0;
+
+            if (selectedMarkers.length === 0 && km === 0 && hExtra === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd && kmBonus === undefined && kmStart === 0 && kmEnd === 0) {
                 delete DB.events[mKey][activeDay];
             } else {
                 DB.events[mKey][activeDay] = {
                     markers: selectedMarkers,
                     kmTotal: km,
+                    kmStart: kmStart,
+                    kmEnd: kmEnd,
                     kmBonus: kmBonus,
                     horasExtra: hExtra,
                     emojis: selectedEmojiObjs,
