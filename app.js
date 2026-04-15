@@ -1722,16 +1722,22 @@ import {
             const mBonusSel = document.getElementById('m-km-bonus-select');
             if (mBonusSel) {
                 mBonusSel.innerHTML = '<option value="">(Nenhum)</option>'; 
-                (DB.config.kmBonusList || []).forEach(b => {
+                const bonusList = DB.config.kmBonusList || [];
+                bonusList.forEach((b, idx) => {
                     const opt = document.createElement('option');
                     opt.value = b.value;
                     opt.innerText = `${b.name} (${b.value}€)`;
-                    if (dayData.kmBonus === b.value) opt.selected = true;
+                    
+                    // Se o dia já tem bónus, seleciona esse. 
+                    // Se for novo e houver itens na lista, o primeiro fica selecionado por defeito (idx === 0)
+                    if (dayData.kmBonus === b.value || (dayData.kmBonus === undefined && idx === 0)) {
+                        opt.selected = true;
+                    }
                     mBonusSel.appendChild(opt);
                 });
                 // Mostrar/Esconder seletor conforme biblioteca
                 const row = document.getElementById('m-bonus-library-row');
-                if (row) row.classList.toggle('hidden', !DB.config.kmBonusList || DB.config.kmBonusList.length === 0);
+                if (row) row.classList.toggle('hidden', bonusList.length === 0);
             }
 
             const mKMS = document.getElementById('m-km-start');
