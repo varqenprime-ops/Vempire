@@ -613,6 +613,7 @@ import {
                 try {
                     const docSnap = await getDoc(doc(db, "users", uid));
                     if (docSnap.exists()) {
+                        console.log("Dados encontrados na nuvem para UID:", uid);
                         DB = docSnap.data();
                         
                         // Garante que os markers default existem
@@ -620,7 +621,9 @@ import {
                             DB.config.markers = JSON.parse(JSON.stringify(MARKERS));
                         }
                         localStorage.setItem(STORE_KEY, JSON.stringify(DB));
+                        alert("Dados recuperados da nuvem com sucesso!"); // Alerta temporário para confirmação
                     } else {
+                        console.warn("Nenhum dado encontrado na nuvem para UID:", uid);
                         // Se não existe na nuvem, init local e sobe
                         loadUserDB(uid);
                         
@@ -635,6 +638,7 @@ import {
                     }
                 } catch (e) {
                     console.error("Erro ao sincronizar com Firestore:", e);
+                    alert("ERRO FIREBASE: " + e.message);
                     loadUserDB(uid);
                 }
 
