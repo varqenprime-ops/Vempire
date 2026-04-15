@@ -152,7 +152,7 @@ import {
                 ],
                 valorHora: 0,
                 markers: JSON.parse(JSON.stringify(MARKERS)),
-                kmBonusList: []
+                kmBonusList: [{ name: 'Internacional', value: 0.09 }]
             },
             events: {}
         };
@@ -453,15 +453,10 @@ import {
             initApp();
 
             if (!isProfileComplete()) {
-
                 document.getElementById('onboarding-overlay').classList.remove('hidden');
-
             } else {
-
-                navTo('profile');
-
+                navTo('calendar');
                 buildCalendar();
-
             }
 
         }
@@ -726,6 +721,7 @@ import {
 
                 DB_SAVE();
                 document.getElementById('onboarding-overlay').classList.add('hidden');
+                navTo('calendar');
                 showApp();
             };
         }
@@ -1725,7 +1721,10 @@ import {
             // Popular seletor de bónus da biblioteca
             const mBonusSel = document.getElementById('m-km-bonus-select');
             if (mBonusSel) {
-                mBonusSel.innerHTML = '<option value="">(Nenhum)</option>';
+                mBonusSel.innerHTML = ''; // Removido (Nenhum) conforme pedido
+                if (!DB.config.kmBonusList || DB.config.kmBonusList.length === 0) {
+                    DB.config.kmBonusList = [{ name: 'Internacional', value: 0.09 }];
+                }
                 (DB.config.kmBonusList || []).forEach(b => {
                     const opt = document.createElement('option');
                     opt.value = b.value;
