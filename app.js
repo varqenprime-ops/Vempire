@@ -151,7 +151,8 @@ import {
                     { id: 2, ate: 99999, valor: 0.20 }
                 ],
                 valorHora: 0,
-                markers: JSON.parse(JSON.stringify(MARKERS))
+                markers: JSON.parse(JSON.stringify(MARKERS)),
+                kmBonusList: []
             },
             events: {}
         };
@@ -1403,13 +1404,9 @@ import {
         window.hueToHex = hueToHex;
         window.hexToHue = hexToHue;
         function renderMgmtTables() {
-
             const bMarkers = document.getElementById('body-markers');
-
             if (bMarkers) {
-
                 bMarkers.innerHTML = '';
-
                 (DB.config.markers || []).forEach((m, idx) => {
                     const tr = document.createElement('tr');
                     const currentHue = hexToHue(m.color || '#6366f1');
@@ -1433,15 +1430,11 @@ import {
                     `;
                     bMarkers.appendChild(tr);
                 });
-
             }
 
             const bKm = document.getElementById('body-km-escaloes');
-
             if (bKm) {
-
                 bKm.innerHTML = '';
-
                 (DB.config.kmEscaloes || []).forEach((e, idx) => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -1455,10 +1448,47 @@ import {
                     `;
                     bKm.appendChild(tr);
                 });
-
             }
 
+            const bBonus = document.getElementById('body-km-bonus-list');
+            if (bBonus) {
+                bBonus.innerHTML = '';
+                (DB.config.kmBonusList || []).forEach((b, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td data-label="Nome"><input type="text" class="mgmt-input" value="${b.name}" onchange="updateBonusItem(${idx}, 'name', this.value)"></td>
+                        <td data-label="Valor (€/KM)"><input type="number" class="mgmt-input" value="${b.value}" step="0.0001" onchange="updateBonusItem(${idx}, 'value', +this.value)"></td>
+                        <td style="text-align:center;">
+                            <button class="btn-del-row-new" onclick="deleteBonusItem(${idx})" aria-label="Eliminar">
+                                ✕
+                            </button>
+                        </td>
+                    `;
+                    bBonus.appendChild(tr);
+                });
+            }
         }
+
+        function addBonusItem() {
+            if (!DB.config.kmBonusList) DB.config.kmBonusList = [];
+            DB.config.kmBonusList.push({ name: 'Novo Bónus', value: 0.09 });
+            DB_SAVE(); renderMgmtTables();
+        }
+        window.addBonusItem = addBonusItem;
+
+        function deleteBonusItem(idx) {
+            if (confirm('Eliminar este bónus predefinido?')) {
+                DB.config.kmBonusList.splice(idx, 1);
+                DB_SAVE(); renderMgmtTables();
+            }
+        }
+        window.deleteBonusItem = deleteBonusItem;
+
+        function updateBonusItem(idx, field, val) {
+            DB.config.kmBonusList[idx][field] = val;
+            DB_SAVE();
+        }
+        window.updateBonusItem = updateBonusItem;
 
 
 
@@ -1692,6 +1722,22 @@ import {
             const mHoras = document.getElementById('m-horas-extra-input');
             if (mHoras) mHoras.value = dayData.horasExtra || '';
 
+            // Popular seletor de bónus da biblioteca
+            const mBonusSel = document.getElementById('m-km-bonus-select');
+            if (mBonusSel) {
+                mBonusSel.innerHTML = '<option value="">(Nenhum)</option>';
+                (DB.config.kmBonusList || []).forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = b.value;
+                    opt.innerText = `${b.name} (${b.value}€)`;
+                    if (dayData.kmBonus === b.value) opt.selected = true;
+                    mBonusSel.appendChild(opt);
+                });
+                // Mostrar/Esconder seletor conforme biblioteca
+                const row = document.getElementById('m-bonus-library-row');
+                if (row) row.classList.toggle('hidden', !DB.config.kmBonusList || DB.config.kmBonusList.length === 0);
+            }
+
             // Limpar auxiliares para n\u00E3o herdar do dia anterior
 
             const mKMS = document.getElementById('m-km-start');
@@ -1865,16 +1911,21 @@ import {
 
             let km = +document.getElementById('m-km-total-input').value || 0;
             let hExtra = +document.getElementById('m-horas-extra-input')?.value || 0;
+            
+            // Valor do bónus selecionado na biblioteca
+            const bSelValue = document.getElementById('m-km-bonus-select')?.value;
+            let kmBonus = bSelValue !== "" ? +bSelValue : undefined;
 
             let sStart = document.getElementById('m-night-start')?.value || '';
             let sEnd = document.getElementById('m-night-end')?.value || '';
 
-            if (selectedMarkers.length === 0 && km === 0 && hExtra === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd) {
+            if (selectedMarkers.length === 0 && km === 0 && hExtra === 0 && selectedEmojiObjs.length === 0 && !sStart && !sEnd && kmBonus === undefined) {
                 delete DB.events[mKey][activeDay];
             } else {
                 DB.events[mKey][activeDay] = {
                     markers: selectedMarkers,
                     kmTotal: km,
+                    kmBonus: kmBonus,
                     horasExtra: hExtra,
                     emojis: selectedEmojiObjs,
                     shiftStart: sStart,

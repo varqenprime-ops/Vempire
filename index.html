@@ -396,17 +396,32 @@
                         </div>
 
                         <div class="setting-row">
-
                             <span class="setting-label">Trabalho Noturno 47.ª (ON:Mensal / OFF:Real)</span>
-
                             <label class="toggle-container">
-
                                 <input type="checkbox" id="cfg-noturno-enabled" class="toggle-input" checked>
-
                                 <div class="toggle-slider"></div>
-
                             </label>
+                        </div>
 
+                        <div style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 20px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                <span class="setting-label" style="font-weight:800; color:var(--accent);">Biblioteca de Bónus KM</span>
+                                <button class="btn-toggle-small" onclick="addBonusItem()" style="background:var(--accent); color:white; border:none; padding:5px 10px;">+ Novo</button>
+                            </div>
+                            <div class="mgmt-table-container">
+                                <table class="mgmt-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome (ex: Especial)</th>
+                                            <th>Valor (€/KM)</th>
+                                            <th style="width:50px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-km-bonus-list">
+                                        <!-- JS Dynamic -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         <div class="setting-row">
@@ -1056,6 +1071,13 @@
                     <div class="minput-row">
                         <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">KM Percorridos</span>
                         <input type="number" id="m-km-total-input" placeholder="0" style="max-width: 140px; margin-top:0;" />
+                    </div>
+                    <!-- Seletor de Bónus da Biblioteca -->
+                    <div class="minput-row" id="m-bonus-library-row" style="margin-top: 10px;">
+                        <span style="font-size: 0.8rem; color: var(--accent); font-weight: 700;">Tipo de Bónus</span>
+                        <select id="m-km-bonus-select" class="setting-input" style="max-width: 140px; margin-top:0; border-color: var(--accent); font-size: 0.8rem;">
+                            <option value="">(Nenhum)</option>
+                        </select>
                     </div>
                     <details style="margin-top: 15px;">
                         <summary style="font-size: 0.75rem; color: var(--text-muted); cursor: pointer; font-weight: 700; opacity: 0.7;">Usar Início/Fim KM</summary>
