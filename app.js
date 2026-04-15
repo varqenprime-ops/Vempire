@@ -14,7 +14,8 @@ import {
     doc, 
     setDoc, 
     getDoc, 
-    onSnapshot 
+    onSnapshot,
+    enableIndexedDbPersistence
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // TODO: SUBSTITUIR PELO TEU CONFIG DA CONSOLA FIREBASE
@@ -35,7 +36,6 @@ import {
         setPersistence(auth, browserLocalPersistence).catch(console.error);
 
         // Otimização para offline no Safari/iPhone
-        import { enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         enableIndexedDbPersistence(db).catch((err) => {
             if (err.code == 'failed-precondition') {
                 console.warn("Múltiplas abas abertas, persistência desativada.");
