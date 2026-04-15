@@ -1740,6 +1740,24 @@ import {
             const mKME = document.getElementById('m-km-end');
             if (mKME) mKME.value = dayData.kmEnd || '';
 
+            // Atalho para marcar hora de Início (Portugal) ao clicar
+            const setTimeNow = (elId) => {
+                const el = document.getElementById(elId);
+                if (el && !el.value) {
+                    const now = new Date();
+                    const hh = String(now.getHours()).padStart(2, '0');
+                    const mm = String(now.getMinutes()).padStart(2, '0');
+                    el.value = `${hh}:${mm}`;
+                }
+            };
+
+            if (inputS) {
+                inputS.onclick = () => setTimeNow('m-night-start');
+            }
+            if (mKMS) {
+                mKMS.onfocus = () => setTimeNow('m-night-start');
+            }
+
             renderMarkersInModal();
 
             renderEmojiGrid();
@@ -1930,9 +1948,102 @@ import {
                 };
             }
 
-            DB_SAVE(); closeModal(); buildCalendar();
-
+            DB_SAVE(); 
+            closeModal();
+            showDailySummary(activeDay, mKey);
         });
+
+        function showDailySummary(day, mKey) {
+            const data = DB.events[mKey][day];
+            if (!data) return;
+
+            const dateLabel = document.getElementById('summary-date-label');
+            if (dateLabel) {
+                const d = new Date(curDate.getFullYear(), curDate.getMonth(), day);
+                dateLabel.innerText = d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+
+            const container = document.getElementById('summary-sections-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let totalGains = 0;
+
+            // 1. Horários
+            if (data.shiftStart || data.shiftEnd) {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;';
+                row.innerHTML = `<span style="color:var(--text-muted);">Horário:</span><span style="font-weight:600; color:var(--text-main);">${data.shiftStart || '--:--'} às ${data.shiftEnd || '--:--'}</span>`;
+                container.appendChild(row);
+            }
+
+            // 2. KM
+            if (data.kmTotal > 0 || data.kmStart > 0) {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;';
+                const label = data.kmStart ? `KM: ${data.kmStart} a ${data.kmEnd}` : 'KM Percorridos:';
+                row.innerHTML = `<span style="color:var(--text-muted);">${label}</span><span style="font-weight:600; color:var(--text-main);">${data.kmTotal} km</span>`;
+                container.appendChild(row);
+
+                // Ganhos KM
+                if (data.kmBonus !== undefined) {
+                    const gain = data.kmTotal * data.kmBonus;
+                    totalGains += gain;
+                    const gRow = document.createElement('div');
+                    gRow.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem; padding-left:10px; border-left:2px solid var(--accent);';
+                    gRow.innerHTML = `<span style="color:var(--text-muted);">Bónus KM (${data.kmBonus}€):</span><span style="font-weight:600; color:var(--green);">+${gain.toLocaleString('pt-PT', {minimumFractionDigits:2})}€</span>`;
+                    container.appendChild(gRow);
+                }
+            }
+
+            // 3. Horas Extra
+            if (data.horasExtra > 0) {
+                const rate = DB.config.valorHora || 0;
+                const gain = data.horasExtra * rate;
+                totalGains += gain;
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;';
+                row.innerHTML = `<span style="color:var(--text-muted);">Horas Extra (${data.horasExtra}h):</span><span style="font-weight:600; color:var(--green);">+${gain.toLocaleString('pt-PT', {minimumFractionDigits:2})}€</span>`;
+                container.appendChild(row);
+            }
+
+            // 4. Marcadores
+            if (data.markers && data.markers.length > 0) {
+                data.markers.forEach(mid => {
+                    const m = (DB.config.markers || []).find(x => x.id === mid);
+                    if (m) {
+                        totalGains += (m.value || 0);
+                        const row = document.createElement('div');
+                        row.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;';
+                        row.innerHTML = `<span style="color:var(--text-muted);">${m.label}:</span><span style="font-weight:600; color:var(--green);">+${(m.value || 0).toLocaleString('pt-PT', {minimumFractionDigits:2})}€</span>`;
+                        container.appendChild(row);
+                    }
+                });
+            }
+
+            // 5. Emojis / Extras
+            if (data.emojis && data.emojis.length > 0) {
+                data.emojis.forEach(e => {
+                    if (e.value > 0) {
+                        totalGains += e.value;
+                        const row = document.createElement('div');
+                        row.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;';
+                        row.innerHTML = `<span style="color:var(--text-muted);">${e.icon} ${e.note || 'Extra'}:</span><span style="font-weight:600; color:var(--green);">+${e.value.toLocaleString('pt-PT', {minimumFractionDigits:2})}€</span>`;
+                        container.appendChild(row);
+                    }
+                });
+            }
+
+            const totalEl = document.getElementById('summary-total-value');
+            if (totalEl) totalEl.innerText = totalGains.toLocaleString('pt-PT', {minimumFractionDigits:2, maximumFractionDigits:2}) + '€';
+
+            document.getElementById('modal-daily-summary').classList.remove('hidden');
+        }
+
+        window.closeSummaryAndRefresh = () => {
+            document.getElementById('modal-daily-summary').classList.add('hidden');
+            buildCalendar();
+        };
 
         function closeModal() { document.getElementById('modal-select').classList.add('hidden'); }
         window.closeModal = closeModal;
