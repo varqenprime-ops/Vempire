@@ -753,11 +753,29 @@
 
                             <button class="btn-add-row" onclick="addKmEscalao()">+ Novo Escalão</button>
 
-                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Os KM são
-                                calculados por
-
-                                patamares. O valor do último patamar aplica-se a tudo o que exceder o limite.</p>
-
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Os KM são calculados por patamares. O valor do último patamar aplica-se a tudo o que exceder o limite.</p>
+                            
+                            <!-- Biblioteca de Bónus KM -->
+                            <div style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 20px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                                    <span class="setting-label" style="font-weight:800; color:var(--accent);">Biblioteca de Bónus KM</span>
+                                    <button class="btn-toggle-small" onclick="addBonusItem()" style="background:var(--accent); color:white; border:none; padding:5px 10px;">+ Novo</button>
+                                </div>
+                                <div class="mgmt-table-container">
+                                    <table class="mgmt-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Nome (ex: Especial)</th>
+                                                <th>Valor (€/KM)</th>
+                                                <th style="width:50px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-km-bonus-list">
+                                            <!-- JS Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
