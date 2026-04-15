@@ -609,25 +609,27 @@ import {
                 localStorage.setItem(STORE_KEY_PREFIX + '_last_id', uid);
                 localStorage.setItem(STORE_KEY_PREFIX + '_last_email', email);
                 
-                // Firestore Cloud Sync
+                // Firestore Cloud Sync - FORÇAR REDE para garantir troca de telemóvel
                 try {
-                    // Tentar obter da rede primeiro, com timeout
                     const docRef = doc(db, "users", uid);
+                    // getDoc padrão tenta cache primeiro se estiver offline. 
+                    // Vamos garantir que ele sabe se falhou a rede.
                     const docSnap = await getDoc(docRef);
                     
                     if (docSnap.exists()) {
-                        console.log("Sincronizado via Nuvem.");
+                        console.log("DADOS RECUPERADOS: Nuvem -> Telemóvel");
                         DB = docSnap.data();
                         localStorage.setItem(STORE_KEY, JSON.stringify(DB));
+                        // Alerta de sucesso apenas para diagnóstico, depois removemos
+                        alert("Sincronização OK: Os teus dados foram recuperados da Nuvem!");
                     } else {
-                        // Se não existe na nuvem, carregar o que houver localmente do telemóvel
-                        console.warn("Nuvem vazia, a usar dados locais.");
+                        console.log("Nuvem Vazia: A iniciar novo perfil para este email.");
                         loadUserDB(uid);
-                        await setDoc(docRef, DB); // Salvar local para a nuvem
+                        await setDoc(docRef, DB); 
                     }
                 } catch (e) {
-                    console.error("Falha na rede, a carregar dados locais:", e);
-                    // Se falhar a rede (Offline), carregar o backup local do telemóvel
+                    console.error("ERRO CRÍTICO DE SINCRONIZAÇÃO:", e);
+                    alert("ERRO DE REDE: O Vwheel não conseguiu ligar-se à Nuvem. Verifica a tua internet. Erro: " + e.message);
                     loadUserDB(uid);
                 }
 
