@@ -611,34 +611,23 @@ import {
                 
                 // Firestore Cloud Sync
                 try {
-                    const docSnap = await getDoc(doc(db, "users", uid));
+                    // Tentar obter da rede primeiro, com timeout
+                    const docRef = doc(db, "users", uid);
+                    const docSnap = await getDoc(docRef);
+                    
                     if (docSnap.exists()) {
-                        console.log("Dados encontrados na nuvem para UID:", uid);
+                        console.log("Sincronizado via Nuvem.");
                         DB = docSnap.data();
-                        
-                        // Garante que os markers default existem
-                        if (!DB.config.markers) {
-                            DB.config.markers = JSON.parse(JSON.stringify(MARKERS));
-                        }
                         localStorage.setItem(STORE_KEY, JSON.stringify(DB));
-                        alert("Dados recuperados da nuvem com sucesso!"); // Alerta temporário para confirmação
                     } else {
-                        console.warn("Nenhum dado encontrado na nuvem para UID:", uid);
-                        // Se não existe na nuvem, init local e sobe
+                        // Se não existe na nuvem, carregar o que houver localmente do telemóvel
+                        console.warn("Nuvem vazia, a usar dados locais.");
                         loadUserDB(uid);
-                        
-                        // Tentar recuperar o nome preenchido no registo
-                        const fallbackName = localStorage.getItem(STORE_KEY_PREFIX + '_name_' + uid);
-                        if (fallbackName && (!DB.config.nome || DB.config.nome.trim() === '')) {
-                            DB.config.nome = fallbackName;
-                        }
-                        
-                        await setDoc(doc(db, "users", uid), DB);
-                        localStorage.removeItem(STORE_KEY_PREFIX + '_name_' + uid); // limpar
+                        await setDoc(docRef, DB); // Salvar local para a nuvem
                     }
                 } catch (e) {
-                    console.error("Erro ao sincronizar com Firestore:", e);
-                    alert("ERRO FIREBASE: " + e.message);
+                    console.error("Falha na rede, a carregar dados locais:", e);
+                    // Se falhar a rede (Offline), carregar o backup local do telemóvel
                     loadUserDB(uid);
                 }
 
