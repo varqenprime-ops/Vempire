@@ -1064,35 +1064,37 @@
 
                 </div>
 
-                <div id="m-km-block" style="margin-top: 25px;">
-                    <div class="minput-row">
-                        <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">KM Percorridos</span>
-                        <input type="number" id="m-km-total-input" placeholder="0" style="max-width: 140px; margin-top:0;" />
-                    </div>
-                    <!-- Seletor de Bónus da Biblioteca -->
-                    <div class="minput-row" id="m-bonus-library-row" style="margin-top: 10px;">
-                        <span style="font-size: 0.8rem; color: var(--accent); font-weight: 700;">Tipo de Bónus</span>
-                        <select id="m-km-bonus-select" class="setting-input" style="max-width: 140px; margin-top:0; border-color: var(--accent); font-size: 0.8rem;">
-                            <option value="">(Nenhum)</option>
-                        </select>
-                    </div>
-                    <details style="margin-top: 15px;">
-                        <summary style="font-size: 0.75rem; color: var(--text-muted); cursor: pointer; font-weight: 700; opacity: 0.7;">Usar Início/Fim KM</summary>
-                        <div class="minput-row" style="margin-top: 15px;">
-                            <span style="font-size: 0.85rem; color: var(--text-muted);">KM Início</span>
-                            <input type="number" id="m-km-start" placeholder="0" style="max-width: 120px; margin-top:0;" />
-                        </div>
-                        <div class="minput-row">
-                            <span style="font-size: 0.85rem; color: var(--text-muted);">KM Fim</span>
-                            <input type="number" id="m-km-end" placeholder="0" style="max-width: 120px; margin-top:0;" />
-                        </div>
-                    </details>
-                </div>
-
+                <!-- HORAS (Movido para cima) -->
                 <div id="m-horas-block" style="margin-top: 25px;">
                     <div class="minput-row">
                         <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">Horas</span>
                         <input type="number" id="m-horas-extra-input" placeholder="0" step="0.5" style="max-width: 140px; margin-top:0;" />
+                    </div>
+                </div>
+
+                <!-- KM BLOCK REORGANIZADO -->
+                <div id="m-km-block" style="margin-top: 20px;">
+                    <!-- Seletor de Bónus (Agora "Tipo de Km") -->
+                    <div class="minput-row" id="m-bonus-library-row" style="margin-bottom: 15px;">
+                        <span style="font-size: 0.85rem; color: var(--accent); font-weight: 700;">Tipo de Km</span>
+                        <select id="m-km-bonus-select" class="setting-input" style="max-width: 140px; margin-top:0; border-color: var(--accent); font-size: 0.85rem;">
+                            <option value="">(Nenhum)</option>
+                        </select>
+                    </div>
+
+                    <div style="background: var(--surface-alt); padding: 12px; border-radius: 12px; border: 1px solid var(--border);">
+                        <div class="minput-row">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">KM Início</span>
+                            <input type="number" id="m-km-start" placeholder="0" style="max-width: 120px; margin-top:0;" />
+                        </div>
+                        <div class="minput-row" style="margin-top: 8px;">
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">KM Fim</span>
+                            <input type="number" id="m-km-end" placeholder="0" style="max-width: 120px; margin-top:0;" />
+                        </div>
+                        <div class="minput-row" style="margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px;">
+                            <span style="font-size: 0.9rem; color: var(--text-main); font-weight: 800;">Total KM</span>
+                            <input type="number" id="m-km-total-input" placeholder="0" style="max-width: 120px; margin-top:0; font-weight: 800; color: var(--accent);" />
+                        </div>
                     </div>
                 </div>
 
