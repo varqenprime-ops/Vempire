@@ -14,8 +14,7 @@ import {
     doc, 
     setDoc, 
     getDoc, 
-    onSnapshot,
-    enableIndexedDbPersistence
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // TODO: SUBSTITUIR PELO TEU CONFIG DA CONSOLA FIREBASE
@@ -34,15 +33,6 @@ import {
         
         // Ativar Persistência Local (Sessão não expira ao fechar browser)
         setPersistence(auth, browserLocalPersistence).catch(console.error);
-
-        // Otimização para offline no Safari/iPhone
-        enableIndexedDbPersistence(db).catch((err) => {
-            if (err.code == 'failed-precondition') {
-                console.warn("Múltiplas abas abertas, persistência desativada.");
-            } else if (err.code == 'unimplemented') {
-                console.warn("O navegador não suporta persistência offline.");
-            }
-        });
 
         const STORE_KEY_PREFIX = 'journey-tracker-pro-v2';
 
@@ -517,6 +507,19 @@ import {
                 const persistenceMode = remember ? browserLocalPersistence : browserSessionPersistence;
                 await setPersistence(auth, persistenceMode);
             } catch (e) { console.error('Erro de persistência:', e); }
+
+            // Google reCAPTCHA Enterprise Validation
+            try {
+                if (typeof grecaptcha !== 'undefined') {
+                    await new Promise((resolve) => {
+                        grecaptcha.enterprise.ready(async () => {
+                            const token = await grecaptcha.enterprise.execute('6Ldy7LcsAAAAAJ98XKXt2sdVGhupTQe6N8Yll-tl', {action: 'LOGIN'});
+                            console.log("reCAPTCHA Validado.");
+                            resolve(token);
+                        });
+                    });
+                }
+            } catch (e) { console.warn("reCAPTCHA Skip (Local/Dev Mode):", e); }
 
             if (!email || (type !== 'google' && pass.length < 6)) {
                 return alert('Por favor, introduz o email admin@vwheel.pt e a password para entrar.');
