@@ -734,6 +734,18 @@ import {
             };
         }
 
+        function updatePhotoUI() {
+            const sidePhoto = document.getElementById('sidebar-photo');
+            const cfgPhoto = document.getElementById('cfg-photo-circle');
+            if (sidePhoto && DB.config.photo) {
+                sidePhoto.innerHTML = `<img src="${DB.config.photo}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
+            }
+            if (cfgPhoto && DB.config.photo) {
+                cfgPhoto.innerHTML = `<img src="${DB.config.photo}" style="width:100%; height:100%; object-fit:cover;" />`;
+            }
+        }
+        window.updatePhotoUI = updatePhotoUI;
+
         // --- Photo Handling ---
         const fileIn = document.getElementById('file-avatar');
         if (fileIn) {
