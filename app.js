@@ -640,6 +640,11 @@ import {
 
                 DB.auth = true;
 
+                // Forçar recreação da UI com dados da nuvem
+                initApp();
+                buildCalendar();
+                updatePhotoUI();
+
                 // Sync de UI Settings imediatamente
                 const n2 = document.getElementById('cfg-nome-2');
                 if (n2 && DB.config.nome) n2.value = DB.config.nome;
